@@ -91,7 +91,7 @@ export default function Roles() {
       </Section>
 
       <Callout title="The golden rule of ownership">
-        Data is fixed where it is created. The Custodian can detect and report a problem in the warehouse, but the correction happens in the source system by the team that owns that process, approved by the Data Owner.
+        Data is fixed where it is created. The Custodian can detect and report a problem in the warehouse, but the correction happens in the Customs Clearance System, Tax Administration System or E-Invoicing Platform (or with the broker or taxpayer who submitted it), approved by the Data Owner.
       </Callout>
     </>
   )

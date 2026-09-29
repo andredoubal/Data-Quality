@@ -72,7 +72,7 @@ export default function Framework() {
       {tab === 'standards' && <Standards />}
       {tab === 'lifecycle' && <Lifecycle />}
       {tab === 'e2e' && (
-        <Section title="End-to-end: from rule creation to remediation" sub="Triggered when a new data asset is created in the HRIS (e.g., Learning & Development, Dependent Details) or a new DQ rule is needed on an existing asset. Scroll sideways to follow the flow.">
+        <Section title="End-to-end: from rule creation to remediation" sub="Triggered when a new data asset is created in a Customs, Tax or E-Invoicing system (e.g., a new excise return, a new e-invoice field) or a new DQ rule is needed on an existing asset. Scroll sideways to follow the flow.">
           <SwimLegend />
           <Swimlane {...E2E} />
           <div className="grid g2">
@@ -82,7 +82,7 @@ export default function Framework() {
             </div>
             <div className="card flat stack">
               <h4>Phase B · Data quality remediation (steps 6–11)</h4>
-              <p className="small" style={{ color: 'var(--ink-2)' }}>Scans run and the report goes to the Steward, who proposes high-priority issues. The Champion confirms. The Custodian logs issues (data product, asset, element, DQ score, sample IDs, failed record count); the source team performs RCA and remediation; the Steward monitors scores and status.</p>
+              <p className="small" style={{ color: 'var(--ink-2)' }}>Scans run and the report goes to the Steward, who proposes high-priority issues. The Champion confirms. The Custodian logs issues (data product, asset, element, DQ score, sample IDs such as declaration numbers or invoice UUIDs, failed record count); the source team performs RCA and remediation; the Steward monitors scores and status.</p>
             </div>
           </div>
         </Section>

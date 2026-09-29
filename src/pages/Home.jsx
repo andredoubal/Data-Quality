@@ -1,4 +1,4 @@
-import { ArrowRight, ShieldCheck, Siren, Orbit, Users, Blocks, Waypoints, LayoutDashboard, Layers, Rocket, RefreshCcw } from 'lucide-react'
+import { ArrowRight, Ship, Landmark, Receipt, ShieldCheck, Siren, Orbit, Users, Blocks, Waypoints, LayoutDashboard, Layers, Rocket, RefreshCcw } from 'lucide-react'
 import { Section, Callout } from '../components/ui.jsx'
 
 const CHAPTERS = [
@@ -6,7 +6,7 @@ const CHAPTERS = [
   { n: 2, title: 'The framework', desc: 'Program, rules & thresholds, issue management, reporting. Plus the six standards and the BAU lifecycle.', icon: Orbit, links: [['framework', 'Framework']] },
   { n: 3, title: 'Who does what', desc: 'Owners, Stewards, Champions, Custodians and the forums that hold them to account, with a full RACI.', icon: Users, links: [['roles', 'Roles']] },
   { n: 4, title: 'Building blocks', desc: 'CDEs, dimensions, rules, profiling, issue prioritization, RCA, remediation and monitoring. Each with process, framework and example.', icon: Blocks, links: [['cdes', 'CDEs'], ['dimensions', 'Dimensions'], ['rules', 'Rules'], ['profiling', 'Profiling'], ['issues', 'Issues'], ['rca', 'RCA'], ['remediation', 'Remediation'], ['monitoring', 'Monitoring']] },
-  { n: 5, title: 'Where issues come from', desc: 'Business change, data entry, integrations, the warehouse, BI queries and migrations, with a real example of each.', icon: Waypoints, links: [['sources', 'Sources']] },
+  { n: 5, title: 'Where issues come from', desc: 'Tariff and tax changes, broker and taxpayer entry, integrations, the warehouse, BI queries and reference data, with a real example of each.', icon: Waypoints, links: [['sources', 'Sources']] },
   { n: 6, title: 'Put it to work', desc: 'A live-style dashboard, the issue registry and every template you need to run the process.', icon: LayoutDashboard, links: [['dashboard', 'Dashboard'], ['registry', 'Registry'], ['templates', 'Templates']] },
 ]
 
@@ -14,7 +14,7 @@ const ROADMAP = [
   {
     icon: Layers, stage: 'Foundational', sub: 'Build the capability',
     cols: [
-      ['Data custodianship', ['Define data custodian roles', 'Nominate HR Data Stewards', 'Train Data Custodians', 'Publish logical DQ rules guidance']],
+      ['Data custodianship', ['Define data custodian roles', 'Nominate Customs, Tax & E-Invoicing Data Stewards', 'Train Data Custodians', 'Publish logical DQ rules guidance']],
       ['Data quality tools', ['DQ issue reports', 'DQ dashboards', 'DQ remediation process']],
       ['Data quality architecture', ['Identify & document CDEs', 'Implement Informatica IDMC (CDQ + CDGC)', 'DQ rules & profiling']],
     ],
@@ -32,7 +32,7 @@ export default function Home({ go }) {
             <div className="eyebrow" style={{ color: '#9fe7dd' }}>Data Quality Academy · Team learning portal</div>
             <h1 style={{ color: '#fff' }}>Trusted data is managed on purpose.</h1>
             <p style={{ fontSize: '1.06rem', opacity: 0.88, maxWidth: '58ch' }}>
-              This portal walks you through how we define, measure, protect and repair the quality of our data. Start with the two mindsets,
+              This portal walks you through how we define, measure, protect and repair the quality of our Customs, Tax and E-Invoicing data. Start with the two mindsets,
               learn the framework and roles, master each building block, then use the dashboard, registry and templates in your day-to-day work.
             </p>
             <div className="row">
@@ -40,7 +40,7 @@ export default function Home({ go }) {
               <button className="btn" style={{ background: 'transparent', color: '#fff', borderColor: 'rgba(255,255,255,0.35)' }} onClick={() => go('templates')}>Jump to templates</button>
             </div>
           </div>
-          <CostPyramid />
+          <DomainPanel />
         </div>
       </section>
 
@@ -103,22 +103,26 @@ export default function Home({ go }) {
   )
 }
 
-function CostPyramid() {
-  const tiers = [
-    { cost: '$1', label: 'Prevention', desc: 'Validate at the point of entry', w: 46 },
-    { cost: '$10', label: 'Correction', desc: 'Find and fix it in the pipeline', w: 72 },
-    { cost: '$100', label: 'Failure', desc: 'Wrong pay, wrong report, wrong decision', w: 100 },
-  ]
+const DOMAINS = [
+  { icon: Ship, name: 'Customs', data: 'Declarations, HS codes, customs value, country of origin, traders' },
+  { icon: Landmark, name: 'Tax', data: 'Taxpayer registration, VAT & excise returns, payments and refunds' },
+  { icon: Receipt, name: 'E-Invoicing', data: 'Cleared and reported e-invoices, seller & buyer VAT, device onboarding' },
+]
+
+function DomainPanel() {
   return (
-    <div className="stack" style={{ gap: 8 }}>
-      <div className="xs" style={{ letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.7 }}>The 1-10-100 rule · cost per bad record</div>
-      {tiers.map((t) => (
-        <div key={t.cost} style={{ width: t.w + '%', margin: '0 auto', background: 'rgba(255,255,255,' + (0.08 + t.w / 700) + ')', borderRadius: 8, padding: '10px 14px', display: 'flex', gap: 12, alignItems: 'center' }}>
-          <span className="big-num" style={{ fontSize: '1.5rem', minWidth: 56 }}>{t.cost}</span>
-          <span className="small" style={{ lineHeight: 1.3 }}><b>{t.label}</b><br /><span style={{ opacity: 0.8 }}>{t.desc}</span></span>
-        </div>
-      ))}
-      <p className="xs" style={{ opacity: 0.7, textAlign: 'center' }}>The later a defect is caught, the more it costs. This is the case for proactive data quality.</p>
+    <div className="stack" style={{ gap: 10 }}>
+      <div className="xs" style={{ letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.7 }}>Our data domains</div>
+      {DOMAINS.map((d) => {
+        const Icon = d.icon
+        return (
+          <div key={d.name} style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 10, padding: '12px 14px', display: 'flex', gap: 12, alignItems: 'center' }}>
+            <span style={{ width: 38, height: 38, borderRadius: 9, background: 'rgba(255,255,255,0.14)', display: 'grid', placeItems: 'center', flex: 'none' }}><Icon size={19} /></span>
+            <span className="small" style={{ lineHeight: 1.35 }}><b style={{ fontSize: '1rem' }}>{d.name}</b><br /><span style={{ opacity: 0.8 }}>{d.data}</span></span>
+          </div>
+        )
+      })}
+      <p className="xs" style={{ opacity: 0.7 }}>Every example in this portal comes from these three domains.</p>
     </div>
   )
 }

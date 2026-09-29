@@ -1,10 +1,10 @@
 // Swimlane specs rendered by <Swimlane />. col = column index, lane = lane id.
 export const E2E = {
   lanes: [
-    { id: 'source', label: 'Source System Team (HRIS)' },
+    { id: 'source', label: 'Source System Team' },
     { id: 'custodian', label: 'Tech & Digital (Custodian)' },
-    { id: 'champion', label: 'HR Data Champion' },
-    { id: 'steward', label: 'HR Data Steward' },
+    { id: 'champion', label: 'Data Champion' },
+    { id: 'steward', label: 'Data Steward' },
   ],
   nodes: [
     { id: 's', lane: 'steward', col: 0, type: 'start', label: 'Start' },

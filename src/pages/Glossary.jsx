@@ -3,6 +3,14 @@ import { BookOpen, Search, CheckCircle2, XCircle } from 'lucide-react'
 import { PageHead, Section, Pill } from '../components/ui.jsx'
 
 const TERMS = [
+  ['CIF / customs value', 'Value of imported goods for duty purposes: cost (FOB) + insurance + freight.'],
+  ['Clearance (e-invoicing)', 'Real-time validation of a standard B2B invoice by the E-Invoicing Platform before it is shared with the buyer.'],
+  ['Reporting (e-invoicing)', 'Submission of a simplified B2C invoice to the E-Invoicing Platform after issue, within 24 hours.'],
+  ['EGS unit', 'E-invoice generation solution: the taxpayer’s device or ERP that creates and submits e-invoices.'],
+  ['HS code', 'Harmonized System tariff code classifying goods; extended nationally to 12 digits.'],
+  ['TIN / VAT number', 'Taxpayer identification number and VAT registration number identifying a taxpayer across Customs, Tax and E-Invoicing.'],
+  ['Invoice UUID', 'Universally unique identifier of an e-invoice, used to detect duplicates.'],
+  ['Amended return', 'A corrected VAT or excise return that replaces the original for the same period.'],
   ['Acceptance threshold', 'The pass-rate levels that decide whether a rule result is fine (green), needs monitoring (amber) or needs remediation (red).'],
   ['Baseline', 'A frozen snapshot of DQ scores at a point in time, used to measure improvement. Required at least quarterly.'],
   ['Business rule / DQ rule', 'A testable statement of what good data looks like, written against one dimension.'],
@@ -12,7 +20,7 @@ const TERMS = [
   ['Data Champion', 'Business lead who confirms priorities and promotes data quality in their function.'],
   ['Data Custodian', 'Technical team that implements and runs data platforms, rules, scans and technical fixes.'],
   ['Data contract', 'An agreement between a data producer and consumer on schema, meaning, quality and freshness.'],
-  ['Data domain', 'A functional area of data with one accountable Data Owner (e.g., Employee, Compensation).'],
+  ['Data domain', 'A functional area of data with one accountable Data Owner: Customs, Tax or E-Invoicing.'],
   ['Data impact assessment', 'A check on how a business or system change affects data, rules and reports, done before go-live.'],
   ['Data lineage', 'The path data takes from source to report, including every transformation.'],
   ['Data Owner', 'Senior business leader accountable for the quality of a data domain.'],
@@ -24,27 +32,27 @@ const TERMS = [
   ['Issue registry', 'The single log of data quality issues with their evidence, owner, priority, root cause and resolution.'],
   ['Proactive DQ', 'Preventing defects through standards, validation, controls and change assessment.'],
   ['Reactive DQ', 'Detecting, investigating and repairing defects that already exist.'],
-  ['Reference data', 'Governed lists of allowed values (countries, grades, job codes) used across systems.'],
+  ['Reference data', 'Governed lists of allowed values (tariff, exchange rates, country, currency and port codes) used across systems.'],
   ['Remediation', 'Actions that correct defective data and remove the root cause.'],
   ['Root cause analysis (RCA)', 'Structured investigation into why an issue happened, using 5 Whys, fishbone and lineage.'],
   ['SLO (service level objective)', 'Target time to resolve an issue by priority (e.g., Critical in 5 business days).'],
 ]
 
 const QUIZ = [
-  { q: 'A new pay component is designed with a pick-list and a validation before go-live. This is…', o: ['Reactive data quality', 'Proactive data quality', 'Profiling'], a: 1 },
+  { q: 'The E-Invoicing Platform rejects an invoice with a missing buyer VAT number at clearance. This is…', o: ['Reactive data quality', 'Proactive data quality', 'Profiling'], a: 1 },
   { q: 'Who approves a change to a data quality rule before the Custodian implements it?', o: ['Data Steward', 'Data Custodian', 'Data Owner'], a: 2 },
-  { q: '"Terminated in HRIS but active in Payroll" fails which dimension?', o: ['Consistency', 'Uniqueness', 'Timeliness'], a: 0 },
-  { q: 'A record passes every format check but the salary is wrong vs. the contract. Which dimension fails?', o: ['Validity', 'Accuracy', 'Completeness'], a: 1 },
+  { q: 'Output VAT in the return differs from VAT on the taxpayer’s e-invoices. Which dimension fails?', o: ['Consistency', 'Uniqueness', 'Timeliness'], a: 0 },
+  { q: 'An invoice shows VAT of 105.00 on 1,000.00 at 15%. The format is fine. Which dimension fails?', o: ['Validity', 'Accuracy', 'Completeness'], a: 1 },
   { q: 'How often must data quality be baselined at minimum?', o: ['Monthly', 'Quarterly', 'Yearly'], a: 1 },
-  { q: 'A report joins employees to all their assignments and double counts. The source of the issue is…', o: ['Data entry', 'Business change', 'BI query / report logic'], a: 2 },
-  { q: 'The warehouse value is wrong because the source is wrong. Where should it be corrected?', o: ['In the warehouse', 'In the source system', 'In the report'], a: 1 },
-  { q: 'In our final DQ score, Business Critical rules carry what weight?', o: ['35%', '50%', '60%'], a: 2 },
+  { q: 'The revenue dashboard counts both original and amended VAT returns. The source of the issue is…', o: ['Data entry', 'Business change', 'BI query / report logic'], a: 2 },
+  { q: 'A declaration in the warehouse has the wrong HS code because the broker submitted it wrong. Where should it be corrected?', o: ['In the warehouse', 'In the Customs Clearance System, with the broker', 'In the report'], a: 1 },
+  { q: 'New HS codes from the annual tariff update are missing in the warehouse. Which source is this?', o: ['Business & regulatory change', 'BI query', 'Data entry'], a: 0 },
 ]
 
 export default function Glossary() {
   const [q, setQ] = useState('')
   const [ans, setAns] = useState({})
-  const list = TERMS.filter(([t, d]) => (t + d).toLowerCase().includes(q.toLowerCase()))
+  const list = [...TERMS].sort((a, b) => a[0].localeCompare(b[0])).filter(([t, d]) => (t + d).toLowerCase().includes(q.toLowerCase()))
   const done = Object.keys(ans).length
   const correct = QUIZ.filter((x, i) => ans[i] === x.a).length
   return (

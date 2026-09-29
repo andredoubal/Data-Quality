@@ -6,68 +6,68 @@ import { Comparison } from './Reactive.jsx'
 const STAGES = [
   {
     id: 'design', label: 'Design & change', icon: GitPullRequest,
-    q: 'Stop defects before a system or process goes live.',
+    q: 'Stop defects before a law, tariff, system or process change goes live.',
     controls: [
-      'Data impact assessment on every business or system change request',
-      'Identify CDEs and define DQ rules before go-live, not after the first bad report',
-      'Data contracts between source and consumer: fields, formats, SLAs',
-      'Reference data and code values agreed with the Data Owner',
+      'Data impact assessment for every tariff update, tax rate change and new e-invoicing wave',
+      'Identify CDEs and define DQ rules before go-live, not after the first bad revenue report',
+      'Data contracts between systems: fields, formats, code lists and timing',
+      'Reference data (tariff, exchange rates, port codes) agreed with the Data Owner and loaded ahead of time',
     ],
-    example: 'A new "Remote Work Allowance" pay component is designed with a pick-list of allowed countries and a rule that the allowance end date must be after the start date, before the first employee is set up.',
+    example: 'The 2027 tariff schedule is loaded into the test environment 30 days before 1 January. Declarations from the last quarter are re-classified against it in a parallel run, so the 140 retired codes are spotted before brokers ever use them.',
   },
   {
-    id: 'entry', label: 'Data entry', icon: PenLine,
-    q: 'Make it easy to enter data correctly and hard to enter it wrong.',
+    id: 'entry', label: 'Data entry & submission', icon: PenLine,
+    q: 'Make it easy for brokers and taxpayers to submit correct data and hard to submit it wrong.',
     controls: [
-      'Mandatory fields for CDEs (Date of Birth, Hire Date, Cost Center)',
-      'Pick-lists instead of free text (Job Code, Country, Termination Reason)',
-      'Format masks and range checks (e-mail pattern, age 16–80 at hire)',
-      'Duplicate-person check on hire and rehire; four-eyes approval on pay changes',
+      'Declaration form validates HS code against the tariff in force and country of origin against ISO 3166',
+      'Customs value (CIF) calculated automatically from FOB, freight and insurance',
+      'E-invoicing platform rejects invoices that fail the XML schema or business rules at clearance',
+      'VAT number check-digit validation and placeholder blocking (e.g., 000000000000000)',
     ],
-    example: 'The HRIS hire form blocks a Hire Date earlier than the Date of Birth + 16 years and warns if a person with the same name and birth date already exists.',
+    example: 'At clearance, the E-Invoicing Platform rejects a standard B2B invoice whose buyer VAT number is missing or fails the check digit, and returns a clear error code to the taxpayer’s system in real time.',
   },
   {
     id: 'integration', label: 'Integration', icon: Plug,
-    q: 'Guarantee what leaves one system arrives complete and unchanged in the next.',
+    q: 'Guarantee that what leaves one system arrives complete and unchanged in the next.',
     controls: [
-      'Record-count and checksum reconciliation per interface run',
+      'Record-count and amount reconciliation for every interface run',
       'Schema-change detection with alerting',
-      'Reject-and-quarantine of records failing mandatory checks',
-      'Interface monitoring with SLAs and on-call ownership',
+      'Reject-and-quarantine of records failing mandatory checks, never silent drops',
+      'Interface monitoring with SLAs and a named owner on call',
     ],
-    example: 'The HRIS → Payroll interface compares 12,480 records sent vs. 12,480 received and the sum of base salary on both sides before payroll opens.',
+    example: 'Every night, the Customs → Tax interface compares 18,402 declarations and 41.7M in import VAT sent against what the tax ledger received, and blocks the posting run if either total differs.',
   },
   {
     id: 'pipeline', label: 'Warehouse & pipelines', icon: Database,
     q: 'Put quality gates in the pipeline so bad data never reaches the gold layer.',
     controls: [
       'Informatica CDQ rules executed as pipeline steps (DQ gates)',
-      'Freshness checks: load completed and data no older than 24 hours',
-      'Referential integrity checks between facts and dimensions',
-      'Automated profiling on new or changed assets before release',
+      'Freshness checks: e-invoice data no older than 24 hours',
+      'Referential integrity: every seller VAT number exists in the taxpayer registry',
+      'Idempotent loads (merge on UUID or declaration number) so replays never duplicate',
     ],
-    example: 'The nightly Employee pipeline halts promotion to the gold layer when more than 2% of active employees have no Cost Center, and notifies the Custodian on duty.',
+    example: 'The hourly e-invoice pipeline stops promotion to the gold layer when more than 0.5% of invoices have a seller VAT number that isn’t active in the taxpayer registry, and alerts the Custodian on duty.',
   },
   {
     id: 'consumption', label: 'Reporting & BI', icon: BarChart3,
-    q: 'Make sure every report uses the same definitions and certified data.',
+    q: 'Make sure every revenue and compliance report uses the same definitions and certified data.',
     controls: [
-      'Certified datasets and a published business glossary (e.g., "Active Headcount")',
-      'Peer review and reconciliation of new report logic against a control total',
-      'DQ scores visible next to the report (trust indicator)',
-      'Semantic layer so measures are defined once',
+      'Certified datasets and a business glossary (e.g., "Active VAT taxpayer", "VAT collected")',
+      'Reconciliation of new report logic to the treasury ledger before release',
+      'DQ scores shown next to the report (trust indicator)',
+      'Semantic layer so each revenue measure is defined once',
     ],
-    example: 'The Headcount dashboard reads only from the certified "Workforce" dataset and shows the latest DQ score for Employee data in its header.',
+    example: 'The revenue dashboard reads only from the certified Revenue dataset, which counts only the latest amendment of each VAT return, and shows the current DQ score for VAT Returns in its header.',
   },
 ]
 
 const PROCESS = [
-  { title: 'Identify CDEs', owner: ['steward', 'owner'], desc: 'Agree which elements are critical for pay, compliance, reporting and decisions.', out: 'Approved CDE list' },
+  { title: 'Identify CDEs', owner: ['steward', 'owner'], desc: 'Agree which elements drive revenue, compliance and border decisions (TIN, HS code, customs value, VAT amounts).', out: 'Approved CDE list' },
   { title: 'Define rules & thresholds', owner: ['steward', 'custodian'], desc: 'Write logical rules per dimension; set green/amber/red thresholds.', out: 'Rule definitions' },
-  { title: 'Embed controls at source', owner: ['source', 'architect'], desc: 'Pick-lists, mandatory fields, validations and approvals in the HRIS.', out: 'Preventive controls' },
+  { title: 'Embed controls at submission', owner: ['source', 'architect'], desc: 'Validations in declaration forms, return forms and e-invoice clearance.', out: 'Preventive controls' },
   { title: 'Automate DQ gates', owner: 'custodian', desc: 'Run rules in pipelines and block or quarantine failing loads.', out: 'Pipeline DQ gates' },
-  { title: 'Assess every change', owner: ['champion', 'architect'], desc: 'Run a data impact assessment on business and system changes.', out: 'Impact assessment' },
-  { title: 'Train & certify', owner: ['owner', 'steward'], desc: 'Train data entry teams; certify datasets and report definitions.', out: 'Trained users, certified data' },
+  { title: 'Assess every change', owner: ['champion', 'architect'], desc: 'Data impact assessment for tariff updates, tax changes and new e-invoicing waves.', out: 'Impact assessment' },
+  { title: 'Guide & certify', owner: ['owner', 'steward'], desc: 'Publish broker and taxpayer guidance; certify datasets and report definitions.', out: 'Guidance, certified data' },
 ]
 
 export default function Proactive() {
@@ -78,21 +78,21 @@ export default function Proactive() {
       <PageHead
         eyebrow="Chapter 1 · Mindset" icon={ShieldCheck}
         title="Proactive data quality"
-        lead="Proactive data quality prevents defects from being created or from travelling downstream. It builds controls into processes, systems and pipelines so that quality is designed in, not inspected in afterwards."
+        lead="Proactive data quality prevents defects from being created or from travelling downstream. It builds controls into declaration forms, returns, e-invoice clearance, interfaces and pipelines so that quality is designed in, not inspected in afterwards."
       />
 
       <div className="grid g3">
         <div className="card stack">
           <h3>What it is</h3>
-          <p className="small" style={{ color: 'var(--ink-2)' }}>Controls that act <b>before</b> or <b>as</b> data is created or moved: validation, standards, approvals, automated gates and change impact assessment.</p>
+          <p className="small" style={{ color: 'var(--ink-2)' }}>Controls that act <b>before</b> or <b>as</b> data is submitted or moved: validation, standards, approvals, automated gates and change impact assessment.</p>
         </div>
         <div className="card stack">
           <h3>Why it matters</h3>
-          <p className="small" style={{ color: 'var(--ink-2)' }}>Preventing one bad record costs about 1 unit; fixing it later costs 10; living with the consequences costs 100. Prevention scales, clean-up doesn't.</p>
+          <p className="small" style={{ color: 'var(--ink-2)' }}>A wrong HS code or VAT amount that is stopped at submission never reaches revenue reports, risk engines or refunds. Rejecting it at the door is far simpler than chasing a taxpayer or broker months later.</p>
         </div>
         <div className="card stack">
           <h3>When we use it</h3>
-          <p className="small" style={{ color: 'var(--ink-2)' }}>New systems, new data assets, business changes, new interfaces and new reports. Any time data is about to be created or change shape.</p>
+          <p className="small" style={{ color: 'var(--ink-2)' }}>New systems, new e-invoicing waves, tariff and tax changes, new interfaces and new reports. Any time data is about to be created or change shape.</p>
         </div>
       </div>
 
@@ -120,21 +120,21 @@ export default function Proactive() {
         </div>
       </Section>
 
-      <Section title="The proactive process" sub="Run once when a data asset is onboarded, then again whenever the business or system changes.">
+      <Section title="The proactive process" sub="Run once when a data asset is onboarded, then again whenever the law, tariff, business or system changes.">
         <StepFlow steps={PROCESS} />
       </Section>
 
       <Section title="Proactive toolkit">
         <div className="grid g4">
           {[
-            ['Data standards', 'Formats, code values and naming agreed and published in the catalog.'],
-            ['Validation at entry', 'Mandatory fields, pick-lists, masks and range checks in the source system.'],
+            ['Data standards', 'Formats and code lists (HS, ISO country, UN/LOCODE, currency) agreed and published in the catalog.'],
+            ['Validation at submission', 'Mandatory fields, tariff look-ups, check digits and calculated fields in forms and APIs.'],
+            ['E-invoice clearance rules', 'Schema and business-rule checks that reject a bad invoice before it is issued.'],
             ['DQ gates', 'Rules executed inside pipelines that stop or quarantine bad loads.'],
-            ['Data contracts', 'Agreed schema, semantics and freshness between producer and consumer.'],
-            ['Change impact assessment', 'Every change request answers: what data does this create, change or retire?'],
-            ['Reference data management', 'One governed list for countries, job codes, cost centers, grades.'],
-            ['Training', 'Data entry and HR operations teams know the definitions and why they matter.'],
-            ['Certified datasets', 'Reports only read from datasets that pass their DQ thresholds.'],
+            ['Data contracts', 'Agreed schema, meaning and timing between Customs, Tax and E-Invoicing systems.'],
+            ['Change impact assessment', 'Every tariff, tax or regulatory change answers: what data does this create, change or retire?'],
+            ['Reference data management', 'One governed source for tariff, exchange rates, port codes and tax rates.'],
+            ['Broker & taxpayer guidance', 'Clear guides, error messages and training so submitters know the rules.'],
           ].map(([h, p]) => (
             <div key={h} className="card flat stack" style={{ gap: 6 }}>
               <div className="row" style={{ gap: 8 }}><CheckIcon size={16} color="var(--accent)" /><h4>{h}</h4></div>
@@ -148,8 +148,8 @@ export default function Proactive() {
         <div className="grid g3">
           {[
             ['% of CDEs with rules defined before go-live', 'Target ≥ 90%'],
-            ['% of change requests with a data impact assessment', 'Target 100%'],
-            ['% of issues caught by a DQ gate before reaching reports', 'Target ≥ 70%'],
+            ['% of tariff, tax and e-invoicing changes with a data impact assessment', 'Target 100%'],
+            ['% of issues caught at submission or a DQ gate before reaching reports', 'Target ≥ 70%'],
           ].map(([k, t]) => (
             <div key={k} className="card flat stack" style={{ gap: 4 }}>
               <p style={{ fontWeight: 600 }}>{k}</p>

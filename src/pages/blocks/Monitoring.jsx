@@ -135,7 +135,7 @@ function ScoreCalc() {
   const [rows, setRows] = useState([
     { p: 'Business Critical', avail: 141, run: 112, processed: 1250000, passed: 1208750 },
     { p: 'Business Disruptive', avail: 41, run: 35, processed: 420000, passed: 382620 },
-    { p: 'Informational', avail: 2, run: 1, processed: 12480, passed: 11532 },
+    { p: 'Informational', avail: 2, run: 1, processed: 38400, passed: 33792 },
   ])
   const score = (r) => (r.passed / r.processed) * 100
   const final = rows.reduce((a, r) => a + score(r) * WEIGHTS[r.p], 0)
@@ -167,7 +167,7 @@ function ScoreCalc() {
         </div>
       </Section>
       <Callout title="Why weight by priority?">
-        A simple average lets 40 informational rules at 100% hide one failing payroll-critical rule. Weighting keeps the headline score honest about what matters to the business.
+        A simple average lets 40 informational rules at 100% hide one failing rule on import VAT or HS codes. Weighting keeps the headline score honest about what matters to the business.
       </Callout>
     </>
   )

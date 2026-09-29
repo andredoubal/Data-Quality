@@ -16,7 +16,7 @@ const LENSES = {
     color: 'var(--s7)',
     items: [
       ['Boundaries & outliers', 'Analyze upper / lower bounds and frequency distributions.'],
-      ['Aggregation', 'Summary statistics to confirm against business logic (e.g., total headcount).'],
+      ['Aggregation', 'Summary statistics to confirm against business logic (e.g., total declared customs value per day).'],
       ['Data types', 'Audit the expected data type of each column (string, date, boolean).'],
     ],
   },
@@ -38,14 +38,14 @@ const TRIGGERS = [
 ]
 
 const RESULTS = [
-  { col: 'employee_id', type: 'VARCHAR(8)', nulls: 0, distinct: 12480, pattern: 'E99999 (100%)', minmax: 'E00012 – E12931', finding: 'Unique, conforms', tone: 'good' },
-  { col: 'birth_date', type: 'DATE', nulls: 3.2, distinct: 9120, pattern: 'YYYY-MM-DD (100%)', minmax: '1901-01-01 – 2008-06-30', finding: '41 records = 1901-01-01 (default placeholder)', tone: 'crit' },
-  { col: 'hire_date', type: 'DATE', nulls: 0, distinct: 4102, pattern: 'YYYY-MM-DD (100%)', minmax: '1986-02-03 – 2204-03-01', finding: '3 future hire dates', tone: 'warn' },
-  { col: 'cost_center', type: 'VARCHAR(7)', nulls: 1.9, distinct: 318, pattern: 'CC-9999 (97.6%), CC9999 (2.4%)', minmax: '—', finding: 'Two formats; 18 codes not in Finance master', tone: 'crit' },
-  { col: 'country_code', type: 'VARCHAR(4)', nulls: 0.1, distinct: 27, pattern: 'AA (99.4%), A.A. (0.6%)', minmax: '—', finding: '"U.K." and "UK" should be GB', tone: 'warn' },
-  { col: 'work_email', type: 'VARCHAR(80)', nulls: 0.4, distinct: 12398, pattern: 'a.a@company.com (95.9%)', minmax: '—', finding: '82 duplicates, 4.1% off-pattern', tone: 'warn' },
-  { col: 'base_salary', type: 'DECIMAL(12,2)', nulls: 0, distinct: 7011, pattern: 'numeric', minmax: '0.00 – 1,250,000.00', finding: '6 zero salaries on active employees', tone: 'crit' },
-  { col: 'status', type: 'CHAR(1)', nulls: 0, distinct: 4, pattern: 'A 86%, T 12%, L 2%, X <0.1%', minmax: '—', finding: 'Unknown code "X" (3 rows)', tone: 'warn' },
+  { col: 'decl_no', type: 'VARCHAR(16)', nulls: 0, distinct: 412880, pattern: 'DEC-99-9999999 (100%)', minmax: 'DEC-26-0000012 – DEC-26-0131907', finding: 'Unique, conforms', tone: 'good' },
+  { col: 'hs_code', type: 'VARCHAR(12)', nulls: 0, distinct: 11904, pattern: '999999999999 (99.5%), 99999999 (0.5%)', minmax: '010121000000 – 999999999999', finding: '5,900 lines on generic code 9999…; 0.5% only 8 digits', tone: 'crit' },
+  { col: 'origin_cc', type: 'VARCHAR(3)', nulls: 0.2, distinct: 168, pattern: 'AA (99.6%), AAA (0.4%)', minmax: '—', finding: '0.4% use 3-letter codes (ISO alpha-3)', tone: 'warn' },
+  { col: 'customs_value', type: 'DECIMAL(15,2)', nulls: 0, distinct: 603210, pattern: 'numeric', minmax: '0.00 – 48,500,000.00', finding: '212 lines valued at 0.00; 4.2% ≠ FOB+freight+ins.', tone: 'crit' },
+  { col: 'currency', type: 'CHAR(3)', nulls: 0, distinct: 41, pattern: 'AAA (100%)', minmax: '—', finding: 'Conforms to ISO 4217', tone: 'good' },
+  { col: 'importer_tin', type: 'VARCHAR(15)', nulls: 0.9, distinct: 38112, pattern: '9{15} (99.1%)', minmax: '—', finding: '0.9% null, mostly courier declarations', tone: 'warn' },
+  { col: 'gross_weight_kg', type: 'DECIMAL(12,3)', nulls: 0, distinct: 88410, pattern: 'numeric', minmax: '0.001 – 1,900,000.000', finding: '31 lines above 1,000 t: outliers to verify', tone: 'warn' },
+  { col: 'port_code', type: 'CHAR(5)', nulls: 0, distinct: 36, pattern: 'AAAAA (100%)', minmax: '—', finding: '74 lines use retired port codes', tone: 'warn' },
 ]
 
 export default function Profiling({ go }) {
@@ -80,7 +80,7 @@ export default function Profiling({ go }) {
       framework={<ProfilingFramework />}
       example={
         <>
-          <Section title="Profiling results: hr_gold.employee (Q3 baseline)" sub="12,480 active records, profiled in full on 2026-09-01.">
+          <Section title="Profiling results: cus_gold.declaration_line (Q3 baseline)" sub="1,284,000 declaration lines, profiled in full on 2026-09-01.">
             <div className="table-wrap">
               <table className="t">
                 <thead><tr><th>Column</th><th>Type</th><th className="num">Null %</th><th className="num">Distinct</th><th>Patterns</th><th>Min – Max</th><th>Finding</th></tr></thead>
@@ -97,11 +97,11 @@ export default function Profiling({ go }) {
             </div>
           </Section>
           <div className="grid g2">
-            <Callout tone="crit" title="Hidden defect: placeholder dates">
-              Date of Birth looks 96.8% complete, but profiling shows 41 records set to 1901-01-01, a default used to bypass the mandatory field. Those are effectively missing. Result: a new validity rule (DOB &gt; 1930-01-01) and a Steward follow-up with HR Operations.
+            <Callout tone="crit" title="Hidden defect: the generic HS code">
+              HS code looks 100% complete and valid, but profiling shows 5,900 e-commerce lines classified under the catch-all code 999999999999. They pass the rule yet tell us nothing about the goods, and duty may be wrong. Result: a new rule blocking the generic code for commercial shipments and broker guidance from the Steward.
             </Callout>
             <Callout title="Baseline to target">
-              Cost Center completeness baselined at 98.1% with 18 orphan codes. Target: 99.5% with zero orphans by next quarter. The dashboard now tracks this against the baseline.
+              HS code validity baselined at 96.2%. Target: 99% by next quarter. The dashboard now tracks this against the baseline.
             </Callout>
           </div>
         </>

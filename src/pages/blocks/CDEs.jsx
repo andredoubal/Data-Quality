@@ -4,23 +4,23 @@ import Block from '../../components/Block.jsx'
 import { Section, StepFlow, Callout, Pill } from '../../components/ui.jsx'
 
 export const CDE_CRITERIA = [
-  { id: 'reg', label: 'Regulatory / legal', q: 'Used in statutory, tax, labor-law or audit reporting?' },
-  { id: 'fin', label: 'Financial impact', q: 'Drives pay, benefits, cost allocation or financial statements?' },
-  { id: 'ops', label: 'Operational criticality', q: 'Does a core HR process stop or fail if it is wrong?' },
-  { id: 'rep', label: 'Reporting & KPIs', q: 'Used in executive dashboards or key KPIs (headcount, attrition)?' },
-  { id: 'cross', label: 'Cross-system use', q: 'Shared across multiple systems or domains (payroll, finance, IT access)?' },
-  { id: 'priv', label: 'Privacy sensitivity', q: 'Personal or sensitive data that carries privacy risk if wrong?' },
+  { id: 'reg', label: 'Regulatory / legal', q: 'Used in statutory, legal or international reporting (customs law, VAT law, WCO/OECD obligations)?' },
+  { id: 'fin', label: 'Revenue impact', q: 'Drives duty, VAT, excise, penalties or refund amounts?' },
+  { id: 'ops', label: 'Operational criticality', q: 'Does clearance, filing, assessment or invoice clearance fail if it is wrong?' },
+  { id: 'rep', label: 'Reporting & KPIs', q: 'Used in revenue dashboards, trade statistics or executive KPIs?' },
+  { id: 'cross', label: 'Cross-system use', q: 'Shared across Customs, Tax and E-Invoicing systems or with other agencies?' },
+  { id: 'priv', label: 'Confidentiality', q: 'Taxpayer-confidential or commercially sensitive if exposed or wrong?' },
 ]
 
 const SAMPLE = [
-  { el: 'Employee ID', s: { reg: 3, fin: 3, ops: 3, rep: 3, cross: 3, priv: 2 } },
-  { el: 'Date of Birth', s: { reg: 3, fin: 2, ops: 2, rep: 2, cross: 2, priv: 3 } },
-  { el: 'Hire Date', s: { reg: 3, fin: 3, ops: 3, rep: 3, cross: 2, priv: 1 } },
-  { el: 'Base Salary', s: { reg: 2, fin: 3, ops: 3, rep: 2, cross: 2, priv: 3 } },
-  { el: 'Cost Center', s: { reg: 1, fin: 3, ops: 2, rep: 3, cross: 3, priv: 1 } },
-  { el: 'Employment Status', s: { reg: 2, fin: 3, ops: 3, rep: 3, cross: 3, priv: 1 } },
-  { el: 'Job Title (free text)', s: { reg: 1, fin: 1, ops: 1, rep: 1, cross: 1, priv: 1 } },
-  { el: 'Preferred Name', s: { reg: 1, fin: 1, ops: 1, rep: 1, cross: 2, priv: 2 } },
+  { el: 'Taxpayer TIN / VAT Number', s: { reg: 3, fin: 3, ops: 3, rep: 3, cross: 3, priv: 2 } },
+  { el: 'HS Code', s: { reg: 3, fin: 3, ops: 3, rep: 3, cross: 3, priv: 1 } },
+  { el: 'Customs Value (CIF)', s: { reg: 3, fin: 3, ops: 3, rep: 3, cross: 2, priv: 2 } },
+  { el: 'Invoice VAT Amount', s: { reg: 3, fin: 3, ops: 3, rep: 2, cross: 3, priv: 2 } },
+  { el: 'Country of Origin', s: { reg: 3, fin: 2, ops: 2, rep: 3, cross: 2, priv: 1 } },
+  { el: 'Buyer VAT Number (B2B)', s: { reg: 2, fin: 2, ops: 2, rep: 1, cross: 3, priv: 2 } },
+  { el: 'Trader Trading Name', s: { reg: 1, fin: 1, ops: 1, rep: 1, cross: 1, priv: 1 } },
+  { el: 'Taxpayer Contact E-mail', s: { reg: 1, fin: 1, ops: 2, rep: 1, cross: 1, priv: 2 } },
 ]
 
 export const tierOf = (total) =>
@@ -32,7 +32,7 @@ export default function CDEs({ go }) {
       go={go}
       icon={Star}
       title="Critical Data Elements (CDEs)"
-      lead="A CDE is a data element whose quality has a material impact on regulatory compliance, financial outcomes, core operations or key decisions. We can't govern everything equally, so CDEs tell us where to focus rules, monitoring and remediation first."
+      lead="A CDE is a data element whose quality has a material impact on legal compliance, revenue collection, clearance and filing operations or key decisions. We can't govern everything equally, so CDEs tell us where to focus rules, monitoring and remediation first."
       facts={[
         ['Owned by', 'Data Owner (approves)'],
         ['Proposed by', 'Data Steward'],
@@ -44,13 +44,13 @@ export default function CDEs({ go }) {
         <Section title="How we identify and manage CDEs">
           <StepFlow
             steps={[
-              { title: 'Collect candidates', owner: 'steward', desc: 'List elements used in key reports, regulatory filings, payroll, and cross-system interfaces.', out: 'Candidate list' },
-              { title: 'Score against criteria', owner: ['steward', 'champion'], desc: 'Score each candidate 1–3 on six criteria (regulatory, financial, operational, reporting, cross-system, privacy).', out: 'Scored list' },
+              { title: 'Collect candidates', owner: 'steward', desc: 'List elements used in revenue reports, statutory and international reporting, risk engines and cross-system interfaces.', out: 'Candidate list' },
+              { title: 'Score against criteria', owner: ['steward', 'champion'], desc: 'Score each candidate 1–3 on six criteria (regulatory, revenue, operational, reporting, cross-system, confidentiality).', out: 'Scored list' },
               { title: 'Map to physical data', owner: ['architect', 'custodian'], desc: 'Link each CDE to tables/columns in source, warehouse and reports; document lineage.', out: 'Lineage map' },
               { title: 'Approve', owner: 'owner', desc: 'The Data Owner approves the CDE list and tiers for the domain.', out: 'Approved CDEs' },
               { title: 'Publish in catalog', owner: 'custodian', desc: 'Register CDEs as business terms in Informatica CDGC with definition, owner, steward and lineage.', out: 'Catalog entries' },
               { title: 'Attach rules', owner: ['steward', 'custodian'], desc: 'Every Tier 1 CDE gets rules across at least completeness, validity and one more relevant dimension.', out: 'Rule coverage' },
-              { title: 'Review yearly', owner: ['steward', 'owner'], desc: 'Re-score after reorganizations, new regulations or system changes.', out: 'Updated CDE list' },
+              { title: 'Review yearly', owner: ['steward', 'owner'], desc: 'Re-score after tariff or tax law changes, new e-invoicing phases or system changes.', out: 'Updated CDE list' },
             ]}
           />
         </Section>
@@ -103,7 +103,7 @@ function CdeExample() {
   const tier = tierOf(total)
   return (
     <>
-      <Section title="Worked example: HR Employee domain" sub="Eight candidate elements scored by the HR Data Steward and approved by the Head of HR Operations.">
+      <Section title="Worked example: Customs, Tax and E-Invoicing" sub="Eight candidate elements scored by the domain Data Stewards and approved by their Data Owners.">
         <div className="table-wrap">
           <table className="t">
             <thead>
@@ -126,7 +126,7 @@ function CdeExample() {
           </table>
         </div>
       </Section>
-      <Section title="Try it: score an element" sub="Example: Termination Reason. Adjust the scores to see the tier change.">
+      <Section title="Try it: score an element" sub="Example: Excise Goods Category. Adjust the scores to see the tier change.">
         <div className="card grid g2" style={{ alignItems: 'center' }}>
           <div className="stack" style={{ gap: 10 }}>
             {CDE_CRITERIA.map((c) => (
@@ -147,8 +147,8 @@ function CdeExample() {
           </div>
         </div>
       </Section>
-      <Callout title="Why Job Title (free text) isn't a CDE">
-        It's widely visible but nothing critical depends on it: pay, reporting and access all use Job Code. The right move is to govern Job Code as the CDE and treat free-text title as descriptive.
+      <Callout title="Why Trader Trading Name isn't a CDE">
+        It appears on every screen, but nothing critical depends on it: clearance, risk and revenue all key on the TIN. Govern the TIN as the CDE and treat the trading name as descriptive.
       </Callout>
     </>
   )

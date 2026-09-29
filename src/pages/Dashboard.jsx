@@ -6,25 +6,36 @@ import { ISSUES } from '../data/issues.js'
 import { RULES } from '../data/rules.js'
 import { isOpen, isOverdue, TODAY } from './Registry.jsx'
 
-const DOMAINS = ['Employee', 'Organization', 'Compensation', 'Payroll', 'Benefits', 'Learning', 'Recruitment', 'Time & Attendance']
+// Data areas (rows) grouped under the three business domains (filter)
+const AREAS = [
+  { a: 'Declarations', d: 'Customs' },
+  { a: 'Tariff & Classification', d: 'Customs' },
+  { a: 'Trader Registry', d: 'Customs' },
+  { a: 'Taxpayer Registration', d: 'Tax' },
+  { a: 'VAT Returns', d: 'Tax' },
+  { a: 'Excise', d: 'Tax' },
+  { a: 'E-Invoices', d: 'E-Invoicing' },
+  { a: 'Taxpayer Onboarding', d: 'E-Invoicing' },
+]
+const DOMAINS = AREAS.map((x) => x.a)
 const DIMS = ['Completeness', 'Validity', 'Accuracy', 'Consistency', 'Uniqueness', 'Timeliness']
 const MONTHS = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep']
 
-// Latest score per domain x dimension (illustrative)
+// Latest score per data area x dimension (illustrative)
 const MATRIX = {
-  Employee: [96.8, 97.9, 98.1, 95.2, 99.4, 88.6],
-  Organization: [93.6, 98.8, 97.0, 91.4, 99.9, 96.2],
-  Compensation: [99.5, 95.3, 98.4, 97.8, 99.9, 97.1],
-  Payroll: [99.2, 98.7, 98.9, 98.9, 99.0, 99.4],
-  Benefits: [91.8, 96.4, 95.0, 94.1, 99.2, 93.3],
-  Learning: [90.2, 97.5, 94.4, 96.9, 99.7, 89.8],
-  Recruitment: [94.7, 96.0, 92.9, 93.0, 98.9, 91.5],
-  'Time & Attendance': [98.3, 99.8, 96.6, 97.2, 99.5, 86.1],
+  Declarations: [99.1, 98.4, 95.8, 97.4, 99.9, 98.9],
+  'Tariff & Classification': [99.8, 96.2, 97.0, 98.1, 99.9, 96.8],
+  'Trader Registry': [97.6, 88.0, 96.5, 95.9, 99.4, 94.2],
+  'Taxpayer Registration': [98.9, 99.9, 97.8, 96.7, 99.6, 97.3],
+  'VAT Returns': [99.4, 98.7, 96.1, 83.6, 99.9, 91.3],
+  Excise: [90.2, 97.5, 95.4, 94.9, 99.7, 93.8],
+  'E-Invoices': [95.1, 99.1, 97.7, 99.3, 99.2, 93.9],
+  'Taxpayer Onboarding': [93.0, 98.2, 96.6, 97.1, 99.5, 95.5],
 }
-const CDES = { Employee: [18, 15], Organization: [9, 7], Compensation: [11, 10], Payroll: [14, 14], Benefits: [7, 5], Learning: [5, 3], Recruitment: [6, 4], 'Time & Attendance': [8, 6] }
-const RULE_COUNT = { Employee: 42, Organization: 21, Compensation: 26, Payroll: 31, Benefits: 17, Learning: 12, Recruitment: 14, 'Time & Attendance': 21 }
-// Months of improvement, per domain: start offset below latest
-const START_GAP = { Employee: 7.2, Organization: 6.1, Compensation: 3.4, Payroll: 2.2, Benefits: 5.5, Learning: 4.1, Recruitment: 3.0, 'Time & Attendance': 4.8 }
+const CDES = { Declarations: [9, 7], 'Tariff & Classification': [4, 3], 'Trader Registry': [4, 3], 'Taxpayer Registration': [7, 6], 'VAT Returns': [8, 6], Excise: [5, 3], 'E-Invoices': [10, 8], 'Taxpayer Onboarding': [4, 3] }
+const RULE_COUNT = { Declarations: 38, 'Tariff & Classification': 14, 'Trader Registry': 11, 'Taxpayer Registration': 19, 'VAT Returns': 27, Excise: 12, 'E-Invoices': 41, 'Taxpayer Onboarding': 9 }
+// Months of improvement, per area: start offset below latest
+const START_GAP = { Declarations: 4.1, 'Tariff & Classification': 3.2, 'Trader Registry': 5.0, 'Taxpayer Registration': 2.6, 'VAT Returns': 6.4, Excise: 4.4, 'E-Invoices': 7.1, 'Taxpayer Onboarding': 5.8 }
 
 const avg = (a) => a.reduce((x, y) => x + y, 0) / a.length
 const domainScore = (d) => avg(MATRIX[d])
@@ -43,7 +54,7 @@ const statusIcon = (v, t = 95, a = 90) =>
 
 export default function Dashboard() {
   const [domain, setDomain] = useState('All domains')
-  const doms = domain === 'All domains' ? DOMAINS : [domain]
+  const doms = domain === 'All domains' ? DOMAINS : AREAS.filter((x) => x.d === domain).map((x) => x.a)
 
   const trend = useMemo(() => {
     const series = doms.map(trendFor)
@@ -55,7 +66,7 @@ export default function Dashboard() {
   const cde = doms.reduce((a, d) => [a[0] + CDES[d][0], a[1] + CDES[d][1]], [0, 0])
   const rules = doms.reduce((a, d) => a + RULE_COUNT[d], 0)
 
-  const iss = ISSUES.filter((i) => doms.includes(i.domain))
+  const iss = ISSUES.filter((i) => doms.includes(i.product))
   const open = iss.filter(isOpen)
   const closed = iss.filter((i) => i.resolved && i.status !== 'Rejected')
   const avgDays = closed.length ? avg(closed.map((i) => (new Date(i.resolved) - new Date(i.reported)) / 86400000)) : 0
@@ -72,7 +83,7 @@ export default function Dashboard() {
   })
 
   const prioByDomain = DOMAINS.filter((d) => doms.includes(d)).map((d) => {
-    const o = open.filter((i) => i.domain === d)
+    const o = open.filter((i) => i.product === d)
     return { label: d, Critical: o.filter((i) => i.priority === 'Critical').length, High: o.filter((i) => i.priority === 'High').length, Medium: o.filter((i) => i.priority === 'Medium').length, Low: o.filter((i) => i.priority === 'Low').length }
   }).filter((r) => r.Critical + r.High + r.Medium + r.Low > 0)
 
@@ -92,18 +103,18 @@ export default function Dashboard() {
     { l: 'Open issues', v: open.length, sub: <span className="muted">{open.filter((i) => i.priority === 'Critical').length} critical · {open.filter((i) => i.priority === 'High').length} high</span> },
     { l: 'SLO breaches', v: open.filter(isOverdue).length, sub: <span className="muted">Open issues past target date</span>, tone: open.filter(isOverdue).length ? 'crit' : 'good' },
     { l: 'Avg. days to resolve', v: avgDays ? avgDays.toFixed(0) : '—', sub: <span className="muted">{closed.length} issues resolved</span> },
-    { l: 'Active rules', v: rules, sub: <span className="muted">Across {doms.length} domain{doms.length > 1 ? 's' : ''}</span> },
+    { l: 'Active rules', v: rules, sub: <span className="muted">Across {doms.length} data areas</span> },
   ]
 
   return (
     <>
-      <PageHead eyebrow="Workbench" icon={LayoutDashboard} title="Data quality dashboard" lead="How healthy is our HR data, where is it failing, and is the issue backlog under control? Illustrative data; issue charts use the Issue Registry.">
+      <PageHead eyebrow="Workbench" icon={LayoutDashboard} title="Data quality dashboard" lead="How healthy is our Customs, Tax and E-Invoicing data, where is it failing, and is the issue backlog under control? Illustrative data; issue charts use the Issue Registry.">
         <div className="row" style={{ gap: 10 }}>
           <label className="field" htmlFor="dash-domain" style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
             Data domain
             <select id="dash-domain" className="input" value={domain} onChange={(e) => setDomain(e.target.value)}>
               <option>All domains</option>
-              {DOMAINS.map((d) => <option key={d}>{d}</option>)}
+              {['Customs', 'Tax', 'E-Invoicing'].map((d) => <option key={d}>{d}</option>)}
             </select>
           </label>
           <span className="small muted">Last scan: 29 Sep 2026, 02:00 · Informatica CDQ</span>
@@ -140,7 +151,7 @@ export default function Dashboard() {
       </div>
 
       <div className="card stack">
-        <div><div className="chart-title">Domain × dimension heatmap</div><div className="chart-sub">Where to focus. Cells are colored by threshold band; hover for detail.</div></div>
+        <div><div className="chart-title">Data area × dimension heatmap</div><div className="chart-sub">Where to focus. Cells are colored by threshold band; hover for detail.</div></div>
         <Heatmap
           rows={DOMAINS}
           cols={DIMS}
@@ -162,9 +173,9 @@ export default function Dashboard() {
           <FlowChart data={flow} />
         </div>
         <div className="card stack">
-          <div><div className="chart-title">Unresolved issues by domain and priority</div><div className="chart-sub">Open issues only</div></div>
+          <div><div className="chart-title">Unresolved issues by data area and priority</div><div className="chart-sub">Open issues only</div></div>
           <div className="legend">{['Critical', 'High', 'Medium', 'Low'].map((p, i) => <span key={p}><i style={{ background: PRIO_COLORS[i] }} />{p}</span>)}</div>
-          {prioByDomain.length ? <StackedBars data={prioByDomain} keys={['Critical', 'High', 'Medium', 'Low']} colors={PRIO_COLORS} /> : <p className="muted small">No open issues for this domain.</p>}
+          {prioByDomain.length ? <StackedBars data={prioByDomain} keys={['Critical', 'High', 'Medium', 'Low']} colors={PRIO_COLORS} labelW={160} /> : <p className="muted small">No open issues for this domain.</p>}
         </div>
       </div>
 
@@ -203,13 +214,13 @@ export default function Dashboard() {
           <div className="card flat stack" style={{ gap: 6 }}><div className="eyebrow">Ongoing performance</div><span className="big-num">{Math.round((cde[1] / cde[0]) * 100)}%</span><span className="small muted">CDEs above threshold · newly ingested data above threshold 94%</span></div>
           <div className="card flat stack" style={{ gap: 6 }}><div className="eyebrow">Issue management</div><span className="big-num">{open.length}</span><span className="small muted">open · {open.filter((i) => i.status === 'Escalated').length} escalated · {open.filter((i) => i.status === 'Under Review').length} under review</span></div>
           <div className="card flat stack" style={{ gap: 6 }}><div className="eyebrow">Service level objectives</div><span className="big-num">{open.filter(isOverdue).length}</span><span className="small muted">SLO breaches · avg {avgDays ? avgDays.toFixed(0) : '—'} days to resolve</span></div>
-          <div className="card flat stack" style={{ gap: 6 }}><div className="eyebrow">Adoption</div><span className="big-num">6 / 9</span><span className="small muted">HR functions onboarded · 71% of stewards trained</span></div>
+          <div className="card flat stack" style={{ gap: 6 }}><div className="eyebrow">Adoption</div><span className="big-num">6 / 9</span><span className="small muted">business units onboarded · 71% of stewards trained</span></div>
         </div>
       </Section>
 
       <div className="card tint row" style={{ gap: 10 }}>
         <Pill tone="accent">How to read this</Pill>
-        <span className="small">Start top-left: is the score trending toward target? Then use the heatmap to find the weakest domain/dimension, and the issue charts to check the backlog is shrinking and nothing critical is aging.</span>
+        <span className="small">Start top-left: is the score trending toward target? Then use the heatmap to find the weakest data area and dimension, and the issue charts to check the backlog is shrinking and nothing critical is aging.</span>
       </div>
     </>
   )

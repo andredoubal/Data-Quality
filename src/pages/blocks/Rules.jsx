@@ -14,12 +14,12 @@ const ANATOMY = [
 ]
 
 const TYPES = [
-  ['Field-level', 'One column, one record.', 'Date of Birth is not null'],
-  ['Cross-field', 'Two or more columns in the same record.', 'Termination Date populated when Status = Terminated'],
-  ['Cross-table / referential', 'A value must exist in another table.', 'Cost Center exists in the Finance cost center master'],
-  ['Cross-system', 'Same fact compared in two systems.', 'HRIS status = Payroll status'],
-  ['Aggregate / reasonableness', 'Totals or distributions within expected ranges.', 'Monthly headcount change within ±3% unless a reorg is flagged'],
-  ['Timeliness / freshness', 'When data arrives versus when it should.', 'Gold table refreshed within 24 hours'],
+  ['Field-level', 'One column, one record.', 'Importer TIN is not null on an import declaration'],
+  ['Cross-field', 'Two or more columns in the same record.', 'Customs value = FOB + freight + insurance; buyer VAT required when invoice type = Standard'],
+  ['Cross-table / referential', 'A value must exist in another table.', 'HS code exists in the tariff in force on the declaration date'],
+  ['Cross-system', 'Same fact compared in two systems.', 'Output VAT in the return = VAT on the taxpayer’s e-invoices'],
+  ['Aggregate / reasonableness', 'Totals or distributions within expected ranges.', 'Daily import VAT within ±15% of the 30-day average unless a holiday is flagged'],
+  ['Timeliness / freshness', 'When data arrives versus when it should.', 'Simplified invoices reported within 24 hours; e-invoice gold table refreshed hourly'],
 ]
 
 export default function Rules({ go }) {
@@ -81,8 +81,8 @@ export default function Rules({ go }) {
             </div>
           </Section>
           <Callout title="Logical vs. technical rule">
-            <b>Logical</b> (Steward): "Every active employee must have a Cost Center that exists in Finance."<br />
-            <b>Technical</b> (Custodian): <code>cost_center IN (SELECT cc_code FROM fin_gold.cost_center WHERE active = 1)</code>. Keep both in the catalog so business and IT read the same rule.
+            <b>Logical</b> (Steward): "The HS code on every declaration line must exist in the tariff in force on the declaration date."<br />
+            <b>Technical</b> (Custodian): <code>hs_code IN (SELECT code FROM ref.tariff WHERE decl_date BETWEEN valid_from AND valid_to)</code>. Keep both in the catalog so business and IT read the same rule.
           </Callout>
         </>
       }
@@ -92,22 +92,22 @@ export default function Rules({ go }) {
 }
 
 function ThresholdExplainer() {
-  const [score, setScore] = useState(91)
-  const green = 95, amber = 80
+  const [score, setScore] = useState(95.1)
+  const green = 98, amber = 94
   const band = score >= green ? ['good', 'Meets target: no action'] : score >= amber ? ['warn', 'Monitor: steward reviews the trend'] : ['crit', 'Remediate: raise an issue']
   return (
-    <Section title="How thresholds work" sub="Drag the score. Example rule: Date of Birth must not be null (green ≥ 95%, amber 80–95%, red < 80%).">
+    <Section title="How thresholds work" sub="Drag the score. Example rule: buyer VAT number populated on standard B2B invoices (green ≥ 98%, amber 94–98%, red < 94%).">
       <div className="card stack" style={{ gap: 14 }}>
         <div style={{ position: 'relative', height: 34, borderRadius: 8, overflow: 'hidden', display: 'flex' }}>
-          <div style={{ width: `${amber - 50}%`, background: 'var(--crit-soft)' }} />
-          <div style={{ width: `${green - amber}%`, background: 'var(--warn-soft)' }} />
+          <div style={{ width: `${(amber - 80) * 5}%`, background: 'var(--crit-soft)' }} />
+          <div style={{ width: `${(green - amber) * 5}%`, background: 'var(--warn-soft)' }} />
           <div style={{ flex: 1, background: 'var(--good-soft)' }} />
-          <div style={{ position: 'absolute', left: `calc(${(score - 50) * 2}% - 1px)`, top: 0, bottom: 0, width: 3, background: 'var(--ink)' }} />
+          <div style={{ position: 'absolute', left: `calc(${(score - 80) * 5}% - 1px)`, top: 0, bottom: 0, width: 3, background: 'var(--ink)' }} />
         </div>
-        <div className="row between xs muted"><span>50%</span><span>Red &lt; {amber}%</span><span>Amber {amber}–{green}%</span><span>Green ≥ {green}%</span><span>100%</span></div>
-        <input type="range" id="thr-score" aria-label="Rule pass rate" min="50" max="100" step="0.5" value={score} onChange={(e) => setScore(+e.target.value)} />
+        <div className="row between xs muted"><span>80%</span><span>Red &lt; {amber}%</span><span>Amber {amber}–{green}%</span><span>Green ≥ {green}%</span><span>100%</span></div>
+        <input type="range" id="thr-score" aria-label="Rule pass rate" min="80" max="100" step="0.1" value={score} onChange={(e) => setScore(+e.target.value)} />
         <div className="row"><span className="big-num">{score.toFixed(1)}%</span><Pill tone={band[0]}>{band[1]}</Pill></div>
-        <p className="small muted">Pass rate = records passing the rule ÷ records evaluated. With 12,480 active employees, {score.toFixed(1)}% means {Math.round(12480 * (1 - score / 100)).toLocaleString()} failing records.</p>
+        <p className="small muted">Pass rate = records passing the rule ÷ records evaluated. With 842,000 standard invoices this month, {score.toFixed(1)}% means {Math.round(842000 * (1 - score / 100)).toLocaleString()} failing invoices.</p>
       </div>
     </Section>
   )
@@ -116,7 +116,7 @@ function ThresholdExplainer() {
 function RuleExamples() {
   const [dim, setDim] = useState('All')
   const list = RULES.filter((r) => dim === 'All' || r.dim === dim)
-  const s = RULES[0]
+  const s = RULES.find((r) => r.id === 'DQ00014')
   return (
     <>
       <Section title="Sample rule definition" sub="One fully completed rule, laid out the way it appears in the template.">
@@ -133,14 +133,14 @@ function RuleExamples() {
           </table>
         </div>
       </Section>
-      <Section title="HR rule catalog" sub="Fourteen live-style rules across all six dimensions, with their latest scores." action={<Seg label="Filter by dimension" value={dim} onChange={setDim} options={['All', 'Completeness', 'Validity', 'Consistency', 'Uniqueness', 'Timeliness', 'Accuracy']} />}>
+      <Section title="Rule catalog" sub="Sixteen live-style rules across Customs, Tax and E-Invoicing and all six dimensions, with their latest scores." action={<Seg label="Filter by dimension" value={dim} onChange={setDim} options={['All', 'Completeness', 'Validity', 'Consistency', 'Uniqueness', 'Timeliness', 'Accuracy']} />}>
         <div className="table-wrap">
           <table className="t">
-            <thead><tr><th>Rule ID</th><th>Business term</th><th>Rule</th><th>Dimension</th><th>Priority</th><th>Thresholds (G / A)</th><th>Technical rule</th><th className="num">Latest score</th></tr></thead>
+            <thead><tr><th>Rule ID</th><th>Domain</th><th>Business term</th><th>Rule</th><th>Dimension</th><th>Priority</th><th>Thresholds (G / A)</th><th>Technical rule</th><th className="num">Latest score</th></tr></thead>
             <tbody>
               {list.map((r) => (
                 <tr key={r.id}>
-                  <td className="mono">{r.id}</td><td style={{ fontWeight: 600 }}>{r.term}</td><td style={{ minWidth: 240 }}>{r.rule}</td><td>{r.dim}</td><td className="small">{r.priority}</td>
+                  <td className="mono">{r.id}</td><td>{r.domain}</td><td style={{ fontWeight: 600 }}>{r.term}</td><td style={{ minWidth: 240 }}>{r.rule}</td><td>{r.dim}</td><td className="small">{r.priority}</td>
                   <td className="mono xs">≥{r.t[0]} / ≥{r.t[1]}</td><td className="mono xs" style={{ minWidth: 220 }}>{r.tech}</td>
                   <td className="num"><ScorePill score={r.score} t={{ green: r.t[0], amber: r.t[1] }} /></td>
                 </tr>

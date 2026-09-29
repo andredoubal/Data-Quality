@@ -13,7 +13,7 @@ const COLUMNS = [
   { k: 'id', l: 'Issue ID', core: true, mono: true },
   { k: 'title', l: 'Title', core: true, w: 260 },
   { k: 'domain', l: 'Data domain', core: true },
-  { k: 'product', l: 'Data product' },
+  { k: 'product', l: 'Data area' },
   { k: 'asset', l: 'Data asset', mono: true },
   { k: 'element', l: 'Data element', core: true },
   { k: 'cde', l: 'CDE' },
@@ -208,7 +208,7 @@ function IssueDrawer({ issue: i, onClose }) {
         </div>
         <dl className="kv">
           <dt>Data domain</dt><dd>{i.domain}</dd>
-          <dt>Data product</dt><dd>{i.product}</dd>
+          <dt>Data area</dt><dd>{i.product}</dd>
           <dt>Data asset</dt><dd className="mono">{i.asset}</dd>
           <dt>Data element</dt><dd>{i.element}</dd>
           <dt>Rule / Term ID</dt><dd className="mono">{i.rule} · {i.term}</dd>
@@ -233,7 +233,7 @@ function IssueDrawer({ issue: i, onClose }) {
 }
 
 function NewIssue({ onClose, onSave, nextId }) {
-  const [d, setD] = useState({ title: '', domain: 'Employee', element: '', dim: 'Completeness', expected: '', actual: '', failed: '', samples: '', assigned: '', priority: 'Medium', source: 'Data entry' })
+  const [d, setD] = useState({ title: '', domain: 'Customs', element: '', dim: 'Completeness', expected: '', actual: '', failed: '', samples: '', assigned: '', priority: 'Medium', source: 'Data entry' })
   const [err, setErr] = useState('')
   const set = (k) => (e) => setD({ ...d, [k]: e.target.value })
   const submit = (e) => {
@@ -256,9 +256,9 @@ function NewIssue({ onClose, onSave, nextId }) {
       <form className="drawer" onSubmit={submit} aria-label="Log a new issue">
         <div className="row between"><h2>Log a data quality issue</h2><button type="button" className="btn ghost sm" onClick={onClose} aria-label="Close"><X size={18} /></button></div>
         <p className="small muted">Practice form. Entries stay in this browser session only.</p>
-        {field('title', 'Issue title *', { placeholder: 'e.g., Hire date missing for interns' })}
+        {field('title', 'Issue title *', { placeholder: 'e.g., Exporter TIN missing on re-export declarations' })}
         <div className="grid g2" style={{ gap: 10 }}>
-          {pick('domain', 'Data domain', ['Employee', 'Organization', 'Compensation', 'Payroll', 'Benefits', 'Learning', 'Recruitment', 'Time & Attendance'])}
+          {pick('domain', 'Data domain', ['Customs', 'Tax', 'E-Invoicing'])}
           {field('element', 'Data element *')}
           {pick('dim', 'Dimension', ['Completeness', 'Validity', 'Accuracy', 'Consistency', 'Uniqueness', 'Timeliness'])}
           {pick('source', 'Suspected source', ['Business change', 'Data entry', 'Source system / integration', 'Data warehouse / pipeline', 'BI query / report logic', 'Migration & reference data'])}

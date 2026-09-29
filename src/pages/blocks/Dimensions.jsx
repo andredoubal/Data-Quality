@@ -4,38 +4,38 @@ import Block from '../../components/Block.jsx'
 import { Section, StepFlow, Callout } from '../../components/ui.jsx'
 
 export const DIMENSIONS = [
-  { id: 'Accuracy', icon: Target, q: 'Is the value in a data field correct?', measure: '% of values that match an authoritative source', rule: 'Base Salary in the HRIS equals Base Salary in the signed offer / payroll', fail: 'Salary keyed as 85,000 instead of 58,000' },
-  { id: 'Completeness', icon: CircleDashed, q: 'Is all necessary data present, and are mandatory fields populated for all records?', measure: '% of records where the field is populated', rule: 'Date of Birth must not be null for active employees', fail: '312 employees without Date of Birth' },
-  { id: 'Consistency', icon: GitCompare, q: 'Does the same field in two systems or tables show the same value?', measure: '% of records where values agree across systems', rule: 'Employment Status in HRIS = status in Payroll and Identity system', fail: 'Terminated in HRIS, still active in Payroll' },
-  { id: 'Validity', icon: BadgeCheck, q: 'Do data values fall within acceptable ranges and formats defined by the business?', measure: '% of values conforming to format, range or allowed list', rule: 'Hire Date ≥ Date of Birth + 16 years; Country in ISO 3166 list', fail: 'Hire Date 2204-03-01; country "UK " with a trailing space' },
-  { id: 'Uniqueness', icon: Fingerprint, q: 'Is each real-world entity recorded once, and can records for the same person be linked?', measure: '% of records with no duplicates on the business key', rule: 'One active Person record per National ID', fail: 'Rehire created a second person profile' },
-  { id: 'Timeliness', icon: Timer, q: 'Is the data up to date and available when needed?', measure: '% of records updated within the agreed SLA', rule: 'Terminations entered within 2 business days of the last working day', fail: 'Termination entered 5 weeks late; access not revoked' },
+  { id: 'Accuracy', icon: Target, q: 'Is the value in a data field correct?', measure: '% of values that match an authoritative source or recalculation', rule: 'Invoice VAT amount = taxable amount × VAT rate; customs value = FOB + freight + insurance', fail: 'VAT of 105.00 on a taxable amount of 1,000.00 at 15% (should be 150.00)' },
+  { id: 'Completeness', icon: CircleDashed, q: 'Is all necessary data present, and are mandatory fields populated for all records?', measure: '% of records where the field is populated', rule: 'Importer TIN must not be null on import declarations', fail: '3,100 courier declarations without an importer TIN' },
+  { id: 'Consistency', icon: GitCompare, q: 'Does the same fact show the same value across systems or tables?', measure: '% of records where values agree across systems', rule: 'Output VAT in the return reconciles to VAT on the taxpayer’s e-invoices', fail: 'Return declares 2.1M output VAT; e-invoices total 2.6M' },
+  { id: 'Validity', icon: BadgeCheck, q: 'Do values fall within the formats, ranges and code lists defined by the business?', measure: '% of values conforming to format, range or allowed list', rule: 'HS code exists in the tariff in force; VAT number is 15 digits with a valid check digit', fail: 'Retired HS code used after 1 January; VAT number with 14 digits' },
+  { id: 'Uniqueness', icon: Fingerprint, q: 'Is each real-world record captured once?', measure: '% of records with no duplicates on the business key', rule: 'One record per e-invoice UUID; one active VAT registration per commercial registration', fail: 'Same invoice UUID loaded twice after a batch replay' },
+  { id: 'Timeliness', icon: Timer, q: 'Is the data submitted and available when it should be?', measure: '% of records received within the agreed deadline', rule: 'Simplified invoices reported within 24 hours; VAT returns filed by the due date', fail: 'Retail POS invoices reported 52 hours after issue' },
 ]
 
-// A tiny employee table seeded with defects. Each defect is tagged with the dimension it violates.
+// A small set of e-invoices seeded with defects. Each defect is tagged with the dimension it violates.
 const ROWS = [
-  { id: 'E10231', name: 'Amira Haddad', dob: '1988-04-12', hire: '2015-06-01', status: 'Active', payroll: 'Active', cc: 'CC-4100', country: 'AE', upd: '2 days' },
-  { id: 'E10232', name: 'Liam O’Connor', dob: '', hire: '2019-01-14', status: 'Active', payroll: 'Active', cc: 'CC-4100', country: 'IE', upd: '1 day' },
-  { id: 'E10233', name: 'Sara Nasser', dob: '1995-09-30', hire: '2204-03-01', status: 'Active', payroll: 'Active', cc: 'CC-5200', country: 'SA', upd: '3 days' },
-  { id: 'E10234', name: 'Rahul Mehta', dob: '1979-02-17', hire: '2008-11-03', status: 'Terminated', payroll: 'Active', cc: 'CC-5200', country: 'IN', upd: '41 days' },
-  { id: 'E10235', name: 'Amira Haddad', dob: '1988-04-12', hire: '2023-02-20', status: 'Active', payroll: 'Active', cc: 'CC-4300', country: 'AE', upd: '1 day' },
-  { id: 'E10236', name: 'Chen Wei', dob: '1990-07-08', hire: '2017-05-22', status: 'Active', payroll: 'Active', cc: '', country: 'U.K.', upd: '2 days' },
+  { id: 'INV-1001', uuid: '8e1f…a2c4', type: 'Standard', seller: '300112233400003', sstatus: 'Active', buyer: '310998877600003', issued: '2026-09-20', taxable: '1,000.00', vat: '150.00', rep: '0 h' },
+  { id: 'INV-1002', uuid: '5c0a…19b7', type: 'Standard', seller: '300112233400003', sstatus: 'Active', buyer: '', issued: '2026-09-21', taxable: '4,200.00', vat: '630.00', rep: '0 h' },
+  { id: 'INV-1003', uuid: 'd4e2…7f10', type: 'Standard', seller: '30055443320003', sstatus: 'Active', buyer: '311223344500003', issued: '2026-11-02', taxable: '1,000.00', vat: '105.00', rep: '0 h' },
+  { id: 'INV-1004', uuid: '7a93…c3e8', type: 'Simplified', seller: '300776655400003', sstatus: 'Deregistered', buyer: '—', issued: '2026-09-18', taxable: '86.96', vat: '13.04', rep: '52 h' },
+  { id: 'INV-1005', uuid: '8e1f…a2c4', type: 'Standard', seller: '300112233400003', sstatus: 'Active', buyer: '310998877600003', issued: '2026-09-20', taxable: '1,000.00', vat: '150.00', rep: '0 h' },
+  { id: 'INV-1006', uuid: 'b210…44d1', type: 'Simplified', seller: '300665544300003', sstatus: 'Active', buyer: '—', issued: '2026-09-22', taxable: '43.48', vat: '6.52', rep: '3 h' },
 ]
 const DEFECTS = {
-  Completeness: [['E10232', 'dob'], ['E10236', 'cc']],
-  Validity: [['E10233', 'hire'], ['E10236', 'country']],
-  Consistency: [['E10234', 'status'], ['E10234', 'payroll']],
-  Uniqueness: [['E10231', 'name'], ['E10235', 'name']],
-  Timeliness: [['E10234', 'upd']],
-  Accuracy: [['E10233', 'dob']],
+  Completeness: [['INV-1002', 'buyer']],
+  Validity: [['INV-1003', 'seller'], ['INV-1003', 'issued']],
+  Consistency: [['INV-1004', 'seller'], ['INV-1004', 'sstatus']],
+  Uniqueness: [['INV-1001', 'uuid'], ['INV-1005', 'uuid']],
+  Timeliness: [['INV-1004', 'rep']],
+  Accuracy: [['INV-1003', 'vat']],
 }
 const EXPLAIN = {
-  Completeness: 'Liam has no Date of Birth and Chen has no Cost Center. Both are mandatory CDEs.',
-  Validity: 'Sara’s Hire Date is in the future (2204) and Chen’s country "U.K." is not a valid ISO code (GB).',
-  Consistency: 'Rahul is Terminated in the HRIS but still Active in Payroll.',
-  Uniqueness: 'Amira Haddad appears twice with the same Date of Birth: a rehire created a second person record.',
-  Timeliness: 'Rahul’s record was last updated 41 days ago: his termination reached systems far too late.',
-  Accuracy: 'Sara’s Date of Birth passes every format check, but her passport says 1995-03-09: day and month were swapped. Only a trusted source reveals this.',
+  Completeness: 'INV-1002 is a standard B2B tax invoice with no buyer VAT number. It is mandatory for standard invoices.',
+  Validity: 'INV-1003 has a seller VAT number with only 14 digits, and an issue date in the future (2 November 2026).',
+  Consistency: 'INV-1004 was issued by a seller that the taxpayer registry shows as Deregistered. The two systems disagree.',
+  Uniqueness: 'INV-1001 and INV-1005 carry the same UUID: the same invoice was loaded twice.',
+  Timeliness: 'INV-1004 is a simplified invoice reported 52 hours after issue. The limit is 24 hours.',
+  Accuracy: 'INV-1003 shows VAT of 105.00 on 1,000.00 at 15%. The digits look plausible and pass format checks, but the correct value is 150.00. Only a recalculation reveals it.',
 }
 
 export default function Dimensions({ go }) {
@@ -44,7 +44,7 @@ export default function Dimensions({ go }) {
       go={go}
       icon={Ruler}
       title="Data quality dimensions"
-      lead="Dimensions are the lenses we use to measure data quality. Every rule is written against one dimension, so scores can be compared and aggregated across elements, assets and domains."
+      lead="Dimensions are the lenses we use to measure data quality. Every rule is written against one dimension, so scores can be compared and aggregated across Customs, Tax and E-Invoicing."
       facts={[
         ['Standard set', 'Six core dimensions'],
         ['Used by', 'Every DQ rule'],
@@ -56,18 +56,18 @@ export default function Dimensions({ go }) {
         <Section title="How to choose dimensions for an element">
           <StepFlow
             steps={[
-              { title: 'Start from the use', owner: 'steward', desc: 'Ask how the element is used: pay, compliance, reporting, access? The use tells you what "wrong" means.' },
-              { title: 'Always check completeness & validity', owner: 'steward', desc: 'These are cheap to measure and catch most entry errors. Apply them to every CDE.' },
-              { title: 'Add consistency if shared', owner: ['steward', 'architect'], desc: 'If the element exists in more than one system, compare them.' },
-              { title: 'Add uniqueness for keys', owner: 'steward', desc: 'Person, employee and position identifiers must be unique.' },
-              { title: 'Add timeliness for events', owner: 'steward', desc: 'Hires, terminations, transfers and pay changes must arrive within an SLA.' },
-              { title: 'Add accuracy where a source of truth exists', owner: ['steward', 'owner'], desc: 'Accuracy needs a reference (payroll, contract, government ID). Sample-based checks are fine.' },
+              { title: 'Start from the use', owner: 'steward', desc: 'Ask how the element is used: duty and VAT calculation, risk targeting, trade statistics, refunds? The use tells you what "wrong" means.' },
+              { title: 'Always check completeness & validity', owner: 'steward', desc: 'Cheap to measure, and they catch most submission errors. Apply them to every CDE.' },
+              { title: 'Add consistency if shared', owner: ['steward', 'architect'], desc: 'If the fact exists in more than one system (declaration ↔ tax ledger, return ↔ e-invoices), compare them.' },
+              { title: 'Add uniqueness for keys', owner: 'steward', desc: 'TINs, VAT registrations, declaration numbers and invoice UUIDs must be unique.' },
+              { title: 'Add timeliness for deadlines', owner: 'steward', desc: 'Returns, e-invoice reporting and interface loads all have legal or agreed deadlines.' },
+              { title: 'Add accuracy where a source of truth exists', owner: ['steward', 'owner'], desc: 'Accuracy needs a reference: a recalculation, a certificate, an audit sample. Sample-based checks are fine.' },
             ]}
           />
         </Section>
       }
       framework={
-        <Section title="The six dimensions" sub="Definition, how it's measured, an example rule and what failure looks like in HR data.">
+        <Section title="The six dimensions" sub="Definition, how it's measured, an example rule and what failure looks like in our data.">
           <div className="grid g3">
             {DIMENSIONS.map((d) => {
               const Icon = d.icon
@@ -94,14 +94,14 @@ export default function Dimensions({ go }) {
 function DimensionLab() {
   const [dim, setDim] = useState('Completeness')
   const bad = (id, col) => DEFECTS[dim].some(([r, c]) => r === id && c === col)
-  const cell = (r, col, v) => (
-    <td style={bad(r.id, col) ? { background: 'var(--crit-soft)', color: 'var(--crit-ink)', fontWeight: 600, outline: '2px solid var(--crit)', outlineOffset: -2 } : {}}>
+  const cell = (r, col, v, mono) => (
+    <td className={mono ? 'mono' : ''} style={bad(r.id, col) ? { background: 'var(--crit-soft)', color: 'var(--crit-ink)', fontWeight: 600, outline: '2px solid var(--crit)', outlineOffset: -2 } : {}}>
       {v || <span className="muted">(blank)</span>}
     </td>
   )
   return (
     <>
-      <Section title="Dimension lab: one table, six lenses" sub="Six employee records hide six kinds of defect. Choose a dimension to highlight the cells that fail it.">
+      <Section title="Dimension lab: six e-invoices, six lenses" sub="These invoices hide six kinds of defect. Choose a dimension to highlight the cells that fail it.">
         <div className="row" style={{ gap: 6 }}>
           {DIMENSIONS.map((d) => (
             <button key={d.id} className={'btn sm' + (dim === d.id ? ' primary' : '')} onClick={() => setDim(d.id)}>{d.id}</button>
@@ -110,20 +110,21 @@ function DimensionLab() {
         <div className="table-wrap">
           <table className="t">
             <thead>
-              <tr><th>Employee ID</th><th>Name</th><th>Date of Birth</th><th>Hire Date</th><th>HRIS Status</th><th>Payroll Status</th><th>Cost Center</th><th>Country</th><th>Last update</th></tr>
+              <tr><th>Invoice</th><th>UUID</th><th>Type</th><th>Seller VAT</th><th>Seller status (registry)</th><th>Buyer VAT</th><th>Issue date</th><th className="num">Taxable</th><th className="num">VAT 15%</th><th>Reported after</th></tr>
             </thead>
             <tbody>
               {ROWS.map((r) => (
                 <tr key={r.id}>
                   <td className="mono">{r.id}</td>
-                  {cell(r, 'name', r.name)}
-                  {cell(r, 'dob', r.dob)}
-                  {cell(r, 'hire', r.hire)}
-                  {cell(r, 'status', r.status)}
-                  {cell(r, 'payroll', r.payroll)}
-                  {cell(r, 'cc', r.cc)}
-                  {cell(r, 'country', r.country)}
-                  {cell(r, 'upd', r.upd)}
+                  {cell(r, 'uuid', r.uuid, true)}
+                  <td>{r.type}</td>
+                  {cell(r, 'seller', r.seller, true)}
+                  {cell(r, 'sstatus', r.sstatus)}
+                  {cell(r, 'buyer', r.buyer, true)}
+                  {cell(r, 'issued', r.issued)}
+                  <td className="num">{r.taxable}</td>
+                  {cell(r, 'vat', r.vat)}
+                  {cell(r, 'rep', r.rep)}
                 </tr>
               ))}
             </tbody>
@@ -132,7 +133,7 @@ function DimensionLab() {
         <Callout title={dim}>{EXPLAIN[dim]}</Callout>
       </Section>
       <Callout tone="warn" title="Takeaway">
-        A record can pass five dimensions and still fail the sixth. That's why each CDE is measured on several dimensions, and why accuracy (the hardest to automate) needs a trusted reference.
+        A record can pass five dimensions and still fail the sixth. That's why each CDE is measured on several dimensions, and why accuracy (the hardest to automate) needs a recalculation or a trusted reference.
       </Callout>
     </>
   )

@@ -3,15 +3,15 @@ import Block from '../../components/Block.jsx'
 import { Section, StepFlow, Callout, RoleChip, Pill } from '../../components/ui.jsx'
 
 const STRATEGIES = [
-  { icon: Eraser, t: 'Correct', term: 'Short term', d: 'Fix the bad records at the source system. Bulk-load corrections where volumes are large, with Owner approval.', e: 'Map 18 orphan cost centers; update 236 assignments in the HRIS.' },
-  { icon: ShieldPlus, t: 'Prevent', term: 'Long term', d: 'Remove the root cause: change the process, add a system validation, fix the interface or pipeline code.', e: 'Add "update reporting hierarchy" to the reorg checklist; make hierarchy mandatory on new cost centers.' },
-  { icon: Radar, t: 'Detect', term: 'Ongoing', d: 'Add or tighten a DQ rule so any recurrence is caught quickly.', e: 'New rule DQ00015: every active cost center has a parent in the hierarchy.' },
-  { icon: Umbrella, t: 'Contain / accept', term: 'Temporary', d: 'Warn users, annotate reports, or formally accept the risk if a fix costs more than the impact.', e: 'Banner on the headcount dashboard until the fix is deployed.' },
+  { icon: Eraser, t: 'Correct', term: 'Short term', d: 'Fix the bad records at the source system. Bulk-load corrections where volumes are large, with Owner approval.', e: 'Reprocess the 1,240 July declarations with the correct exchange rates.' },
+  { icon: ShieldPlus, t: 'Prevent', term: 'Long term', d: 'Remove the root cause: change the process, add a system validation, fix the interface or pipeline code.', e: 'Fallback to the last published rate on holidays; name an owner for exchange rate reference data.' },
+  { icon: Radar, t: 'Detect', term: 'Ongoing', d: 'Add or tighten a DQ rule so any recurrence is caught quickly.', e: 'New rule DQ00018: a rate exists for every currency and calendar day.' },
+  { icon: Umbrella, t: 'Contain / accept', term: 'Temporary', d: 'Warn users, annotate reports, or formally accept the risk if a fix costs more than the impact.', e: 'Banner on the revenue dashboard: July customs duty under review.' },
 ]
 
 const WHERE = [
-  ['Business change', 'Process & governance', 'Business process owner, Champion'],
-  ['Data entry', 'Source system + training', 'Source System Team, HR Operations'],
+  ['Business change', 'Process, reference data & governance', 'Policy / tariff owner, Champion'],
+  ['Data entry', 'Submission validation + broker / taxpayer guidance', 'Source System Team, Customs / Tax operations'],
   ['Source system / integration', 'Source config or interface', 'Source System Team, Custodian'],
   ['Data warehouse / pipeline', 'Pipeline code', 'Data Custodian'],
   ['BI query / report logic', 'Semantic layer / report', 'BI developer, Custodian'],
@@ -19,13 +19,13 @@ const WHERE = [
 ]
 
 const PLAN = [
-  { a: 'Confirm scope: list 236 affected employees and 18 orphan cost centers', o: 'custodian', s: 0, d: 2, st: 'Done' },
-  { a: 'Agree hierarchy mapping with Finance', o: 'steward', s: 2, d: 3, st: 'Done' },
-  { a: 'Load hierarchy mapping in HRIS', o: 'source', s: 5, d: 2, st: 'Done' },
-  { a: 'Technical testing: rerun pipeline in QA, check counts', o: 'custodian', s: 7, d: 2, st: 'In progress' },
-  { a: 'Business testing: HRBPs verify team lists', o: 'steward', s: 9, d: 3, st: 'Planned' },
-  { a: 'Deploy and rerun DQ scan; confirm score change', o: 'custodian', s: 12, d: 1, st: 'Planned' },
-  { a: 'Add hierarchy step to reorg checklist; new rule DQ00015', o: 'owner', s: 12, d: 4, st: 'Planned' },
+  { a: 'Confirm scope: list 1,240 declarations and 9 currencies without a rate', o: 'custodian', s: 0, d: 2, st: 'Done' },
+  { a: 'Agree fallback rule (last published rate) with Finance and Treasury', o: 'steward', s: 2, d: 3, st: 'Done' },
+  { a: 'Build fallback and missing-rate alert in the rate pipeline', o: 'custodian', s: 5, d: 2, st: 'Done' },
+  { a: 'Technical testing: reprocess July in QA, zero lines at rate 0', o: 'custodian', s: 7, d: 2, st: 'In progress' },
+  { a: 'Business testing: duty totals reconcile to treasury ledger', o: 'steward', s: 9, d: 3, st: 'Planned' },
+  { a: 'Deploy, reprocess July in production, rerun DQ scan', o: 'custodian', s: 12, d: 1, st: 'Planned' },
+  { a: 'Designate exchange rates as CDE; add rule DQ00018', o: 'owner', s: 12, d: 4, st: 'Planned' },
   { a: 'Close issue and report at DG Working Group', o: 'steward', s: 16, d: 1, st: 'Planned' },
 ]
 
@@ -92,7 +92,7 @@ export default function Remediation({ go }) {
             </div>
           </Section>
           <Callout tone="crit" title="Never fix it downstream only">
-            Patching values in the warehouse or a report hides the problem: the source stays wrong and the next load overwrites the fix. Downstream patches are containment, and must have a source fix in the plan.
+            Patching revenue figures in the warehouse or a report hides the problem: the source stays wrong and the next load overwrites the fix. Downstream patches are containment, and must have a source fix in the plan.
           </Callout>
         </>
       }
@@ -106,7 +106,7 @@ function PlanExample() {
   const tone = { Done: 'good', 'In progress': 'warn', Planned: 'neutral' }
   return (
     <>
-      <Section title="Remediation plan: DQI-2026-0142 · Orphan cost centers after reorg" sub="Priority High · Score 76 · Owner: Head of HR Operations · Expected Cost Center consistency after fix: 99.6% (from 91.4%).">
+      <Section title="Remediation plan: DQI-2026-0108 · Missing exchange rates on public holidays" sub="Priority High · Score 77 · Owner: Customs Operations Director · Expected exchange rate completeness after fix: 100% (from 99.4%).">
         <div className="table-wrap">
           <table className="t" style={{ minWidth: 900 }}>
             <thead>
@@ -136,9 +136,9 @@ function PlanExample() {
         <p className="xs muted">Timeline in business days from plan approval.</p>
       </Section>
       <div className="grid g3">
-        <div className="card flat stack"><div className="eyebrow">Correct</div><p className="small">Map 18 cost centers; update 236 assignments at source.</p></div>
-        <div className="card flat stack"><div className="eyebrow">Prevent</div><p className="small">Reorg checklist step + mandatory hierarchy on new cost centers.</p></div>
-        <div className="card flat stack"><div className="eyebrow">Detect</div><p className="small">New rule DQ00015 runs daily with threshold 99.5%.</p></div>
+        <div className="card flat stack"><div className="eyebrow">Correct</div><p className="small">Reprocess 1,240 July declarations with correct rates.</p></div>
+        <div className="card flat stack"><div className="eyebrow">Prevent</div><p className="small">Holiday fallback rate + named owner for exchange rates.</p></div>
+        <div className="card flat stack"><div className="eyebrow">Detect</div><p className="small">New rule DQ00018 runs daily with threshold 100%.</p></div>
       </div>
     </>
   )

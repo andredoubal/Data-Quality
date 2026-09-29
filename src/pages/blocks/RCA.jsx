@@ -4,29 +4,29 @@ import Block from '../../components/Block.jsx'
 import { Section, StepFlow, Callout, Pill } from '../../components/ui.jsx'
 
 export const ROOT_CAUSES = [
-  ['Business change', 'Reorg, new policy, new pay component, M&A not reflected in data or rules'],
-  ['Data entry', 'Manual keying error, workaround, placeholder values, missing training'],
-  ['Source system / integration', 'Missing validation, interface mapping, dropped records, timing'],
+  ['Business change', 'Tariff update, VAT or excise rate change, new e-invoicing wave, new law not reflected in data or rules'],
+  ['Data entry', 'Broker or taxpayer keying error, placeholder values, wrong classification, missing guidance'],
+  ['Source system / integration', 'Missing validation, interface mapping, dropped records, taxpayer ERP (EGS) behavior, timing'],
   ['Data warehouse / pipeline', 'Transformation bug, incremental load gap, schema drift, late-arriving data'],
   ['BI query / report logic', 'Wrong join or filter, inconsistent definition, stale extract'],
-  ['Migration & reference data', 'Legacy conversion mapping, outdated code lists, master data drift'],
+  ['Migration & reference data', 'Legacy registration migration, outdated tariff, exchange rate or port code lists'],
 ]
 
 const FISH = [
-  { cat: 'People', causes: ['HR admins not trained on new cost centers', 'Managers submit transfers late'] },
-  { cat: 'Process', causes: ['No step to map new cost centers to hierarchy', 'Reorg go-live outside change control'] },
-  { cat: 'Technology', causes: ['Hierarchy table loaded monthly, not daily', 'No DQ gate on hierarchy join'] },
-  { cat: 'Data', causes: ['52 cost centers without parent', 'Effective dates overlap old and new'] },
-  { cat: 'Governance', causes: ['Finance and HR own different hierarchies', 'No CDE rule on Cost Center hierarchy'] },
-  { cat: 'Change', causes: ['Reorg announced 2 weeks before go-live', 'No data impact assessment'] },
+  { cat: 'People', causes: ['Analysts adjust figures by hand', 'No named owner for FX rates'] },
+  { cat: 'Process', causes: ['No holiday calendar in feed', 'No duty-to-ledger reconciliation'] },
+  { cat: 'Technology', causes: ['Join defaults missing rate to 0', 'No alert on empty rate load'] },
+  { cat: 'Data', causes: ['1,240 lines without a rate', '9 currencies affected'] },
+  { cat: 'Governance', causes: ['FX rates not a CDE', 'No DQ rule on rate table'] },
+  { cat: 'Change', causes: ['Central bank feed format changed', 'Change not assessed for data'] },
 ]
 
 const WHYS = [
-  ['Why is the headcount dashboard 52 higher than HR Operations’ count?', 'Because 52 employees are counted in two departments.'],
-  ['Why are they counted twice?', 'Because their new cost centers have no parent in the reporting hierarchy, so the report falls back to the old department as well.'],
-  ['Why do the new cost centers have no parent?', 'Because Finance created them in the cost center master but nobody added them to the HR reporting hierarchy.'],
-  ['Why did nobody add them?', 'Because the reorganization process has no step to update the reporting hierarchy.'],
-  ['Why is there no such step?', 'Because the reorg was run as a business change without a data impact assessment. ← Root cause'],
+  ['Why is July customs duty on the dashboard 4% below the treasury ledger?', 'Because 1,240 foreign-currency declarations were converted to local currency at 0.'],
+  ['Why were they converted at 0?', 'Because the exchange rate table had no rate for their declaration dates, and the join defaults a missing rate to 0.'],
+  ['Why was there no rate for those dates?', 'Because the central bank feed publishes nothing on public holidays, and those declarations were lodged on a holiday.'],
+  ['Why didn\u2019t the pipeline handle that?', 'Because it has no fallback to the last published rate and no alert when a day\u2019s rates are missing.'],
+  ['Why was that never built?', 'Because exchange rates were never governed as a CDE: no owner, no rules, no monitoring. \u2190 Root cause'],
 ]
 
 export default function RCA({ go }) {
@@ -49,7 +49,7 @@ export default function RCA({ go }) {
           <StepFlow
             steps={[
               { title: 'Reproduce', owner: 'custodian', desc: 'Re-run the rule; pull sample IDs; confirm the issue and its size.', out: 'Confirmed scope' },
-              { title: 'Trace lineage', owner: ['custodian', 'architect'], desc: 'Follow the data from report → warehouse → interface → source in Informatica CDGC lineage. Find the first point where it goes wrong.', out: 'Point of failure' },
+              { title: 'Trace lineage', owner: ['custodian', 'architect'], desc: 'Follow the data from revenue report → warehouse → interface → Customs, Tax or E-Invoicing system in Informatica CDGC lineage. Find the first point where it goes wrong.', out: 'Point of failure' },
               { title: 'Ask why (5 Whys)', owner: ['custodian', 'steward'], desc: 'Keep asking why until you reach a process, system or policy cause, not a person.', out: 'Causal chain' },
               { title: 'Map contributing factors', owner: ['steward', 'source'], desc: 'Use a fishbone for complex issues: people, process, technology, data, governance, change.', out: 'Fishbone' },
               { title: 'Categorize', owner: 'custodian', desc: 'Assign a root cause category so trends can be reported and proactive fixes targeted.', out: 'Root cause category' },
@@ -78,13 +78,13 @@ export default function RCA({ go }) {
             </div>
           </Section>
           <Callout tone="warn" title="Blame-free by design">
-            "Someone typed it wrong" is never a root cause. Ask why the system allowed it, why the person didn't know, or why nobody noticed. That's where the lasting fix is.
+            "The broker typed it wrong" is never a root cause. Ask why the declaration form allowed it, why the broker didn't know the rule, or why nobody noticed. That's where the lasting fix is.
           </Callout>
         </>
       }
       example={
         <>
-          <Section title="5 Whys: the headcount double count" sub="Reveal one step at a time, the way you would run it in a workshop.">
+          <Section title="5 Whys: customs duty below the ledger" sub="Reveal one step at a time, the way you would run it in a workshop.">
             <div className="stack" style={{ gap: 8 }}>
               {WHYS.slice(0, shown).map(([q, a], i) => (
                 <div key={i} className="card flat" style={{ display: 'grid', gridTemplateColumns: '40px minmax(0,1fr)', gap: 12, borderColor: i === 4 ? 'var(--accent)' : 'var(--line)' }}>
@@ -95,7 +95,7 @@ export default function RCA({ go }) {
               <div className="row">
                 {shown < WHYS.length && <button className="btn primary sm" onClick={() => setShown(shown + 1)}>Ask why again</button>}
                 {shown > 1 && <button className="btn sm" onClick={() => setShown(1)}>Start over</button>}
-                {shown === WHYS.length && <Pill tone="accent">Root cause category: Business change</Pill>}
+                {shown === WHYS.length && <Pill tone="accent">Root cause category: Migration & reference data</Pill>}
               </div>
             </div>
           </Section>
@@ -118,7 +118,7 @@ function Fishbone() {
         <rect width={W} height={H} fill="var(--surface)" />
         <line x1="40" x2={headX} y1={spineY} y2={spineY} stroke="var(--navy)" strokeWidth="4" />
         <path d={`M${headX},${spineY - 44} L${W - 16},${spineY - 44} L${W - 16},${spineY + 44} L${headX},${spineY + 44} Z`} fill="var(--navy)" />
-        {['Headcount 52', 'higher than', 'HR Ops count'].map((t, i) => (
+        {['Duty 4% below', 'treasury', 'ledger (July)'].map((t, i) => (
           <text key={i} x={headX + (W - 16 - headX) / 2} y={spineY - 14 + i * 17} textAnchor="middle" fontSize="13" fontWeight="600" fill="#ffffff">{t}</text>
         ))}
         {[...top.map((f, i) => ({ f, i, up: true })), ...bot.map((f, i) => ({ f, i, up: false }))].map(({ f, i, up }) => {

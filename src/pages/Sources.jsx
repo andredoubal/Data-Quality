@@ -4,92 +4,92 @@ import { PageHead, Section, Callout, Pill } from '../components/ui.jsx'
 
 export const SOURCES = [
   {
-    id: 'business', icon: Building2, name: 'Business changes', stage: 0,
-    what: 'The business changes faster than the data definitions, rules and mappings that describe it. Reorganizations, new policies, new pay components, acquisitions or new legal requirements make yesterday’s correct data wrong or incomplete today.',
-    causes: ['Reorg creates new departments or cost centers', 'New policy changes eligibility or definitions', 'M&A brings a new population with different codes', 'New regulation needs data that was never captured'],
+    id: 'business', icon: Building2, name: 'Business & regulatory changes', stage: 0,
+    what: 'Laws, tariffs and programs change faster than the data definitions, reference tables, rules and mappings that describe them. A new tariff schedule, a VAT or excise rate change, a new excise category or a new e-invoicing wave can make yesterday’s correct data wrong or incomplete today.',
+    causes: ['Annual tariff update adds, splits and retires HS codes', 'VAT or excise rate change with an effective date', 'New excise goods category added in law', 'New e-invoicing wave brings new taxpayers and fields', 'New international reporting requirement'],
     example: {
-      title: 'Reorganization breaks headcount by department',
-      story: 'On 1 July, Operations was split into "Field Operations" and "Operations Support" with 18 new cost centers. Finance created them in its master, but the HR reporting hierarchy was not updated. The headcount dashboard showed 52 employees in two departments, and cost allocation for Q3 posted 236 employees to a suspense account.',
-      impact: 'Headcount overstated by 52; $1.4M of salary cost in suspense for three weeks.',
+      title: 'New tariff codes missing on 1 January',
+      story: 'The 2026 tariff schedule came into force on 1 January with 312 new 12-digit codes. The Customs Clearance System was updated, but the warehouse tariff reference table was not. For three weeks, 8,400 declaration lines could not be mapped to a tariff chapter and appeared as "Unknown" in the revenue and trade statistics dashboards.',
+      impact: 'Duty by chapter misreported for January; trade statistics release delayed by a week.',
     },
-    detect: 'Consistency rule: every active cost center has a parent in the reporting hierarchy; month-over-month headcount variance > 3% alert.',
-    prevent: 'Data impact assessment in every reorg and policy change; Champion flags upcoming changes to the Steward.',
-    fix: 'Map new cost centers, reprocess affected periods, add the hierarchy step to the reorg checklist.',
-    dims: ['Consistency', 'Completeness', 'Validity'],
+    detect: 'Validity rule: HS code exists in the tariff in force on the declaration date; alert when "Unknown" chapter share exceeds 0.1%.',
+    prevent: 'Data impact assessment for every tariff, tax and e-invoicing change; tariff loaded and tested 30 days ahead; Champion flags upcoming changes.',
+    fix: 'Load the new tariff into reference data, reprocess January, add tariff releases to the change calendar.',
+    dims: ['Validity', 'Consistency', 'Completeness'],
   },
   {
-    id: 'entry', icon: Keyboard, name: 'Data entry & operational issues', stage: 1,
-    what: 'People create most HR data by hand: hires, transfers, pay changes, terminations. Typos, workarounds, placeholder values, late entry and missing training all introduce defects at the point of creation.',
-    causes: ['Manual typing errors and swapped fields', 'Placeholder values to bypass mandatory fields', 'Late or missing transactions (terminations, transfers)', 'Duplicate records on rehire', 'Unclear definitions or no training'],
+    id: 'entry', icon: Keyboard, name: 'Data entry & submission', stage: 1,
+    what: 'Brokers, taxpayers and officers create most of our data through declarations, returns, registrations and invoices. Keying errors, wrong classification, placeholder values, late filing and unclear guidance introduce defects at the point of submission.',
+    causes: ['Broker selects a wrong or generic HS code', 'Customs value typed instead of calculated', 'Placeholder buyer VAT number (000000000000000)', 'Returns prepared from the general ledger, not issued invoices', 'Late filing by new or small taxpayers'],
     example: {
-      title: 'Placeholder birth dates and late terminations',
-      story: 'HR Operations used 1901-01-01 as Date of Birth when documents were missing, so 41 records passed the completeness rule but were effectively blank. In the same quarter, 7 terminations were entered after the payroll cut-off, so those employees were paid one extra month.',
-      impact: 'Pension eligibility report wrong for 41 employees; $38k overpayment to recover.',
+      title: 'Output VAT does not match e-invoices',
+      story: 'In Q2, 1,870 taxpayers declared output VAT in their VAT return that was more than 2% different from the VAT on the e-invoices they issued in the same period. Most prepared the return from their general ledger, missing credit notes and invoices issued late in the month.',
+      impact: 'Estimated 96M of output VAT under-declared across the population, pending follow-up.',
     },
-    detect: 'Validity rule for placeholder dates; timeliness rule on termination entry lag; duplicate-person check.',
-    prevent: 'Pick-lists and validations in the HRIS form, "document pending" status instead of fake values, termination SLA and training.',
-    fix: 'Correct records at source from documents; recover overpayments; retrain the team.',
-    dims: ['Accuracy', 'Validity', 'Timeliness', 'Uniqueness'],
+    detect: 'Consistency rule between return and e-invoice totals; completeness rule for buyer VAT; accuracy rule for customs value.',
+    prevent: 'Pre-filled VAT returns from e-invoice totals, calculated CIF in the declaration form, placeholder blocking at clearance, broker and taxpayer guidance.',
+    fix: 'Risk-based follow-up letters and amended returns; correct declarations through post-clearance audit.',
+    dims: ['Accuracy', 'Consistency', 'Completeness', 'Timeliness'],
   },
   {
     id: 'integration', icon: Plug, name: 'Source systems & integrations', stage: 2, suggested: true,
-    what: 'Data moves between the HRIS, payroll, identity management, finance and benefits providers. Interface mappings, missing validations in a source system, timing mismatches and silent record drops corrupt data in transit.',
-    causes: ['Interface field mapping errors (truncation, leading zeros)', 'Records rejected by the target without alerting', 'Different code lists in two systems', 'Batch timing: target updated before source'],
+    what: 'Data moves between the Customs Clearance System, Tax Administration System, E-Invoicing Platform, treasury, other agencies and taxpayers’ own ERP systems. Interface mappings, missing validations, timeouts and different rounding logic corrupt or drop data in transit.',
+    causes: ['Interface rejects records silently on timeout', 'Taxpayer ERP (EGS) rounds VAT per line instead of per invoice', 'Courier manifest API does not map importer TIN', 'Different code lists in two systems', 'Batch timing: target read before source finished'],
     example: {
-      title: 'Leading zeros dropped in the payroll interface',
-      story: 'After an interface upgrade, the HRIS → Payroll file wrote Employee ID as a number, so "E00412" style IDs lost characters for 124 employees hired before 2005. Payroll created new payee records for them instead of updating the existing ones.',
-      impact: '124 duplicate payees; year-end tax forms at risk.',
+      title: 'Import VAT not posted to the tax ledger',
+      story: 'The nightly Customs → Tax interface transfers import VAT collected at the border to the tax ledger. After a network change, calls that took longer than 30 seconds timed out and the records were dropped without an error. 640 declarations with import VAT were never posted, so the taxpayers could not reclaim it as input VAT.',
+      impact: '11.2M of import VAT missing from the ledger; taxpayer refund claims rejected.',
     },
-    detect: 'Record-count and checksum reconciliation per run; consistency rule HRIS ID = Payroll ID; uniqueness on payee.',
-    prevent: 'Data contracts with explicit data types; interface regression tests; schema-change alerts.',
-    fix: 'Fix the mapping, merge duplicate payees, replay the affected interface runs.',
-    dims: ['Consistency', 'Uniqueness', 'Validity'],
+    detect: 'Record-count and amount reconciliation per interface run; accuracy rule: every import VAT has a ledger ID.',
+    prevent: 'Data contracts with explicit types and rounding; quarantine instead of silent drops; interface regression tests; conformance testing for taxpayer EGS units.',
+    fix: 'Replay the missing records, add reconciliation that blocks the posting run on mismatch.',
+    dims: ['Consistency', 'Completeness', 'Accuracy'],
   },
   {
     id: 'dwh', icon: Database, name: 'Data warehouse & pipelines', stage: 3,
-    what: 'The warehouse (landing → curated → gold) transforms and combines data. Transformation bugs, incremental load gaps, late-arriving data, history handling and schema drift can create defects that don’t exist in the source.',
-    causes: ['Incremental load misses late or back-dated changes', 'Slowly changing dimension (history) logic errors', 'Join that drops or duplicates rows', 'Schema drift in the source not handled', 'Failed jobs without alerting (stale data)'],
+    what: 'The warehouse (landing → curated → gold) transforms and combines Customs, Tax and E-Invoicing data. Transformation bugs, incremental load gaps, amendments, replays and schema drift create defects that don’t exist in the source.',
+    causes: ['Incremental load misses amended returns', 'Replay after an outage duplicates records', 'Join drops or duplicates rows', 'Schema change in the source not handled', 'Failed jobs without alerting (stale data)'],
     example: {
-      title: 'Back-dated terminations missed by the incremental load',
-      story: 'The nightly Employee pipeline picked up changes where last_modified > previous run. Terminations entered with an effective date in the past but processed by an overnight HRIS batch kept the old last_modified stamp. 63 terminated employees stayed "Active" in the gold layer for up to six weeks.',
-      impact: 'Attrition rate understated by 0.5 pts; headcount overstated in the executive pack.',
+      title: 'Amended VAT returns missed by the incremental load',
+      story: 'The VAT return pipeline picked up changes by original submission date. When 2,310 taxpayers amended their Q1 returns in May, the amendments kept the original submission date and were never loaded. The gold layer still showed the original net VAT payable.',
+      impact: 'Net VAT payable for Q1 understated by 38M in the compliance and revenue forecasts.',
     },
-    detect: 'Consistency rule between source and gold status; row-count reconciliation per layer; freshness rule on load timestamp.',
-    prevent: 'Change-data-capture or effective-date based loads; DQ gates before gold promotion; pipeline unit tests.',
-    fix: 'Correct load logic, reload affected history, add reconciliation to the pipeline.',
-    dims: ['Consistency', 'Timeliness', 'Completeness'],
+    detect: 'Consistency rule between source and gold for latest amendment; row-count reconciliation per layer; freshness rule on load timestamp.',
+    prevent: 'Load on amendment timestamp or change-data-capture; idempotent merges on business keys; DQ gates before gold promotion.',
+    fix: 'Correct the load logic, reload 2026 returns, add a source-to-gold reconciliation.',
+    dims: ['Consistency', 'Timeliness', 'Uniqueness'],
   },
   {
     id: 'bi', icon: BarChart3, name: 'BI queries & report logic', stage: 4,
-    what: 'Even with perfect data, a report can be wrong. Different definitions of the same measure, wrong joins or filters, stale extracts and spreadsheet manipulations produce numbers that don’t match.',
-    causes: ['Two reports define "active headcount" differently', 'Join to a one-to-many table duplicates people', 'Filter excludes a population (e.g., leave of absence)', 'Hard-coded values or stale extracts', 'Manual spreadsheet adjustments'],
+    what: 'Even with correct data, a report can be wrong. Different definitions of the same measure, wrong joins or filters, stale extracts and manual spreadsheet adjustments produce revenue and compliance numbers that don’t match.',
+    causes: ['Original and amended returns both counted', 'Two definitions of "active taxpayer"', 'Filter excludes bonded-warehouse or free-zone declarations', 'Hard-coded exchange rates in a report', 'Manual adjustments in spreadsheets'],
     example: {
-      title: 'Concurrent jobs double-count headcount',
-      story: 'A new diversity dashboard joined Employee to Assignment. 214 employees with two concurrent assignments were counted twice. The report showed 12,694 employees while the certified headcount was 12,480, and the female representation ratio was off by 0.8 pts.',
-      impact: 'Conflicting numbers presented to the executive committee; loss of trust in both reports.',
+      title: 'Revenue dashboard double-counts amended returns',
+      story: 'A new VAT revenue dashboard summed every return record. For 1,120 taxpayers who amended their Q2 return, both the original and the amendment were counted. The dashboard showed VAT collected 2.4% higher than the treasury ledger, and the figure was quoted in an executive briefing.',
+      impact: 'Conflicting revenue figures presented to leadership; loss of trust in the dashboard.',
     },
-    detect: 'Report reconciliation to certified control totals; peer review; aggregate reasonableness rule.',
-    prevent: 'Certified datasets and a semantic layer with one definition per measure; business glossary; report certification.',
-    fix: 'Use primary assignment only; rebase the report on the certified Workforce dataset.',
+    detect: 'Reconciliation of report totals to the treasury ledger; peer review of report logic; aggregate reasonableness rule.',
+    prevent: 'Certified Revenue dataset with one row per return (latest amendment); semantic layer and business glossary; report certification.',
+    fix: 'Rebase the dashboard on the certified dataset; publish a correction note.',
     dims: ['Accuracy', 'Consistency'],
   },
   {
-    id: 'migration', icon: ArchiveRestore, name: 'Data migration & reference data', stage: 2, suggested: true,
-    what: 'Moving from a legacy system, merging populations after an acquisition, or letting reference lists (countries, grades, job codes) drift creates systematic defects affecting many records at once.',
-    causes: ['Legacy-to-new code mapping errors', 'Default values used for unmapped fields', 'Reference lists maintained in several places', 'Retired codes still in use'],
+    id: 'migration', icon: ArchiveRestore, name: 'Migration & reference data', stage: 2, suggested: true,
+    what: 'Migrating from legacy systems, merging registries, or letting reference lists drift (tariff, exchange rates, port codes, country and currency codes) creates systematic defects affecting many records at once.',
+    causes: ['Legacy migration created one registration per branch', 'Exchange rate feed gaps on holidays', 'Retired port or country codes still in use', 'Reference lists maintained in several places'],
     example: {
-      title: 'Legacy grade mapping after an acquisition',
-      story: 'When 900 employees from an acquired company were migrated, their 14 legacy grades were mapped to our grades by name. Three names matched but meant different levels, so 156 employees landed in a grade whose salary band didn’t fit their pay.',
-      impact: 'Salary-in-band rule failed for 156 employees; merit cycle recommendations were wrong.',
+      title: 'Missing exchange rates on public holidays',
+      story: 'The central bank publishes no exchange rates on public holidays. 1,240 foreign-currency declarations lodged on those days found no rate, and the pipeline converted their value to 0. July customs duty on the revenue dashboard came out 4% below the treasury ledger.',
+      impact: 'July duty understated by 27M in reports until reprocessed.',
     },
-    detect: 'Profiling before and after migration; validity rule salary within grade band; reconciliation of totals.',
-    prevent: 'Profile legacy data first, owner-approved mapping tables, mock migrations with DQ checks, one governed reference list.',
-    fix: 'Re-map grades with HR Rewards, correct records, add grade mapping to the reference data catalog.',
-    dims: ['Validity', 'Accuracy', 'Consistency'],
+    detect: 'Completeness rule: a rate exists for every currency and calendar day; reconciliation of duty to the treasury ledger.',
+    prevent: 'Govern exchange rates, tariff and port codes as CDEs with owners; fallback rules; one governed reference list per code set.',
+    fix: 'Reprocess affected declarations; add a last-published-rate fallback and a missing-rate alert.',
+    dims: ['Completeness', 'Validity', 'Accuracy'],
   },
 ]
 
-const STAGES = ['Business', 'Data entry', 'Source systems & interfaces', 'Warehouse & pipelines', 'BI & reports', 'Decisions']
+const STAGES = ['Law, tariff & policy', 'Submission', 'Source systems & interfaces', 'Warehouse & pipelines', 'BI & reports', 'Decisions']
 
 export default function Sources() {
   const [sel, setSel] = useState('business')
@@ -100,7 +100,7 @@ export default function Sources() {
       <PageHead
         eyebrow="Chapter 5 · Root causes" icon={Waypoints}
         title="Where data quality issues come from"
-        lead="Issues can enter at any point in the data journey, from a business decision to the final report. Knowing the source tells you who fixes it, where the fix belongs and which proactive control would have stopped it."
+        lead="Issues can enter at any point in the data journey, from a change in law or tariff to the final revenue report. Knowing the source tells you who fixes it, where the fix belongs and which proactive control would have stopped it."
       />
 
       <Section title="Along the data journey" sub="Six sources of data quality issues. Our four core sources plus two we recommend tracking separately (marked as suggested). Select one.">
@@ -167,7 +167,7 @@ export default function Sources() {
       </Section>
 
       <Callout title="Why we added two sources">
-        <b>Source systems & integrations</b> and <b>data migration & reference data</b> behave differently from data entry and warehouse issues: they are systematic (hundreds of records at once), are fixed by different teams, and need different controls (interface reconciliation, mapping approval). Tracking them separately makes RCA trends more useful.
+        <b>Source systems & integrations</b> and <b>migration & reference data</b> behave differently from submission and warehouse issues: they are systematic (hundreds or thousands of declarations or invoices at once), are fixed by different teams, and need different controls (interface reconciliation, reference data ownership). Tracking them separately makes RCA trends more useful.
       </Callout>
     </>
   )

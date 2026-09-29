@@ -23,10 +23,10 @@ const FIELDS = [
 ]
 
 const EXAMPLES = [
-  { t: 'Terminated employees still active in Payroll', v: { impact: 5, reg: 4, cde: 5, scale: 2, urgency: 5 } },
-  { t: '18 orphan cost centers after reorg', v: { impact: 4, reg: 2, cde: 5, scale: 3, urgency: 4 } },
-  { t: 'Work e-mail off-pattern for 4% of employees', v: { impact: 2, reg: 1, cde: 2, scale: 3, urgency: 2 } },
-  { t: 'Preferred Language uses non-ISO codes', v: { impact: 1, reg: 1, cde: 1, scale: 3, urgency: 1 } },
+  { t: 'Output VAT in returns does not reconcile to e-invoices', v: { impact: 5, reg: 4, cde: 5, scale: 4, urgency: 4 } },
+  { t: 'Import VAT not transferred to the tax ledger', v: { impact: 5, reg: 3, cde: 5, scale: 2, urgency: 5 } },
+  { t: 'Retired port codes on transit declarations', v: { impact: 2, reg: 1, cde: 4, scale: 1, urgency: 2 } },
+  { t: 'Placeholder text in trader trading names', v: { impact: 1, reg: 1, cde: 1, scale: 4, urgency: 1 } },
 ]
 
 export default function Issues({ go }) {
@@ -123,7 +123,7 @@ function PriorityLab() {
   const p = priorityOf(score)
   return (
     <>
-      <Section title="Priority calculator" sub="Example: Cost Center missing for 236 active employees, the week before the quarterly cost allocation.">
+      <Section title="Priority calculator" sub="Example: 1,240 declarations converted at an exchange rate of 0, the week before the monthly revenue report.">
         <div className="card grid g2" style={{ alignItems: 'center' }}>
           <div className="stack" style={{ gap: 12 }}>
             {PRIORITY_CRITERIA.map((c) => (
@@ -166,8 +166,8 @@ function PriorityLab() {
           <table className="t navy-head">
             <thead><tr><th>Rule ID</th><th>Term ID</th><th>Domain</th><th>Expected outcome</th><th>Actual outcome</th><th>Reported on</th><th>Assigned to</th><th>Status</th><th>Severity</th><th>Priority</th><th>Root cause</th><th>Resolved</th></tr></thead>
             <tbody>
-              <tr><td className="mono">DQ00006</td><td className="mono">BT-0142</td><td>Employee</td><td>Status matches in HRIS and Payroll</td><td>7 terminated in HRIS, active in Payroll</td><td>2026-08-04</td><td>Karim Farouk</td><td><Pill tone="warn">In Progress</Pill></td><td>High</td><td><PriorityPill value="Critical" /></td><td>—</td><td>—</td></tr>
-              <tr><td className="mono">DQ00001</td><td className="mono">BT-0007</td><td>Employee</td><td>Date of Birth populated</td><td>312 blank values</td><td>2026-06-10</td><td>Nadia Karim</td><td><Pill tone="good">Resolved</Pill></td><td>Medium</td><td><PriorityPill value="High" /></td><td>Data Entry</td><td>2026-07-02</td></tr>
+              <tr><td className="mono">DQ00008</td><td className="mono">BT-0210</td><td>Tax</td><td>Output VAT within 2% of e-invoice VAT</td><td>1,870 taxpayers differ by more than 2%</td><td>2026-08-04</td><td>Karim Farouk</td><td><Pill tone="warn">In Progress</Pill></td><td>High</td><td><PriorityPill value="Critical" /></td><td>—</td><td>—</td></tr>
+              <tr><td className="mono">DQ00014</td><td className="mono">BT-0305</td><td>E-Invoicing</td><td>Real buyer VAT number on B2B invoices</td><td>41,200 invoices use 000000000000000</td><td>2026-06-10</td><td>Huda Rahman</td><td><Pill tone="good">Resolved</Pill></td><td>Medium</td><td><PriorityPill value="High" /></td><td>Data Entry</td><td>2026-07-02</td></tr>
             </tbody>
           </table>
         </div>
