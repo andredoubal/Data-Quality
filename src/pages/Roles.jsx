@@ -5,7 +5,7 @@ import { ROLES, RACI_ACTIVITIES } from '../data/roles.js'
 
 const RACI_LABEL = { R: 'Responsible', A: 'Accountable', C: 'Consulted', I: 'Informed' }
 const RACI_STYLE = {
-  R: { background: 'var(--accent)', color: '#fff' },
+  R: { background: 'var(--accent)', color: 'var(--on-accent)' },
   A: { background: 'var(--navy)', color: '#fff' },
   C: { background: 'var(--accent-soft)', color: 'var(--accent-ink)' },
   I: { background: 'var(--surface-2)', color: 'var(--ink-2)' },

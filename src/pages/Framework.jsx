@@ -187,7 +187,7 @@ function Lifecycle() {
               return (
                 <g key={i} onClick={() => setSel(i)} style={{ cursor: 'pointer' }}>
                   <circle cx={px} cy={py} r={on ? 27 : 23} fill={on ? 'var(--accent)' : 'var(--navy)'} stroke="var(--surface)" strokeWidth="3" />
-                  <text x={px} y={py + 5} textAnchor="middle" fontSize="15" fontWeight="700" fill="#ffffff">{i + 1}</text>
+                  <text x={px} y={py + 5} textAnchor="middle" fontSize="15" fontWeight="700" fill={on ? '#1B1B1B' : '#ffffff'}>{i + 1}</text>
                 </g>
               )
             })}
@@ -281,7 +281,7 @@ function Assessment() {
       <div className="stack" style={{ gap: 8 }}>
         {ASSESS.map((a, i) => (
           <div key={a.t} className="card flat" style={{ display: 'grid', gridTemplateColumns: '40px minmax(0, 1.1fr) minmax(0, 1fr)', gap: 14, alignItems: 'start', padding: 14 }}>
-            <span className="step-num" style={{ background: 'var(--accent)' }}>{i + 1}</span>
+            <span className="step-num" style={{ background: 'var(--accent)', color: 'var(--on-accent)' }}>{i + 1}</span>
             <div><h4>{a.t}</h4><p className="small" style={{ color: 'var(--ink-2)' }}>{a.d}</p></div>
             <p className="small" style={{ background: 'var(--surface-2)', borderRadius: 6, padding: '8px 10px' }}><b>Example:</b> {a.e}</p>
           </div>
@@ -309,7 +309,7 @@ function RequestLifecycle() {
             <tr>
               <th style={{ width: 150 }}></th>
               {REQ_STAGES.map((st, i) => (
-                <th key={st} style={{ background: 'var(--accent)', color: '#fff' }}><span className="row" style={{ gap: 8, flexWrap: 'nowrap' }}><span className="step-num" style={{ background: '#fff', color: 'var(--accent-ink)', width: 24, height: 24 }}>{i + 1}</span>{st}</span></th>
+                <th key={st} style={{ background: 'var(--navy)', color: '#fff' }}><span className="row" style={{ gap: 8, flexWrap: 'nowrap' }}><span className="step-num" style={{ background: 'var(--accent)', color: 'var(--on-accent)', width: 24, height: 24 }}>{i + 1}</span>{st}</span></th>
               ))}
             </tr>
           </thead>
@@ -321,7 +321,7 @@ function RequestLifecycle() {
               </tr>
             ))}
             <tr>
-              <td style={{ fontWeight: 700, background: 'var(--navy)', color: '#fff' }}>Artifacts</td>
+              <td style={{ fontWeight: 700, background: 'var(--sand)', color: '#15366B' }}>Artifacts</td>
               {REQ_ART.map((items, i) => <td key={i} style={{ background: 'var(--accent-soft)' }}><ul className="bullets small">{items.map((x) => <li key={x}>{x}</li>)}</ul></td>)}
             </tr>
           </tbody>

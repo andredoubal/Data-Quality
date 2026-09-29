@@ -353,7 +353,7 @@ export function Swimlane({ lanes, nodes, edges, colW = 158, laneH = 112, headW =
               {n.tpl && (
                 <g>
                   <circle cx={p.x + p.w / 2 - 2} cy={p.y - p.h / 2 + 2} r="8" fill="var(--accent)" />
-                  <text x={p.x + p.w / 2 - 2} y={p.y - p.h / 2 + 5.5} textAnchor="middle" fontSize="10" fontWeight="700" fill="#ffffff">T</text>
+                  <text x={p.x + p.w / 2 - 2} y={p.y - p.h / 2 + 5.5} textAnchor="middle" fontSize="10" fontWeight="700" fill="#1B1B1B">T</text>
                 </g>
               )}
             </g>

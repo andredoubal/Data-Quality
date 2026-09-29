@@ -29,7 +29,7 @@ export default function Home({ go }) {
       <section className="card" style={{ background: 'var(--navy)', color: '#fff', border: 0, padding: 'clamp(22px, 4vw, 40px)' }}>
         <div className="grid g2" style={{ alignItems: 'center', gap: 28 }}>
           <div className="stack" style={{ gap: 14 }}>
-            <div className="eyebrow" style={{ color: '#9fe7dd' }}>Data Quality Academy · Team learning portal</div>
+            <div className="eyebrow" style={{ color: 'var(--brand-sand)' }}>ZATCA Data Quality Academy · Team learning portal</div>
             <h1 style={{ color: '#fff' }}>Trusted data is managed on purpose.</h1>
             <p style={{ fontSize: '1.06rem', opacity: 0.88, maxWidth: '58ch' }}>
               This portal walks you through how we define, measure, protect and repair the quality of our Customs, Tax and E-Invoicing data. Start with the two mindsets,

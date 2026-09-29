@@ -128,7 +128,7 @@ function Fishbone() {
             <g key={f.cat}>
               <line x1={x0} y1={y0} x2={x1} y2={spineY} stroke="var(--ink-2)" strokeWidth="2" />
               <rect x={x0 - 50} y={up ? y0 - 28 : y0 + 4} width="100" height="24" rx="5" fill="var(--accent)" />
-              <text x={x0} y={up ? y0 - 11 : y0 + 21} textAnchor="middle" fontSize="12.5" fontWeight="700" fill="#ffffff">{f.cat}</text>
+              <text x={x0} y={up ? y0 - 11 : y0 + 21} textAnchor="middle" fontSize="12.5" fontWeight="700" fill="#1B1B1B">{f.cat}</text>
               {f.causes.map((c, k) => {
                 const t = up ? 0.35 + k * 0.3 : 0.35 + k * 0.3
                 const cx = x0 + (x1 - x0) * t
