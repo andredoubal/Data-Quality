@@ -7,7 +7,7 @@ import { RULES } from '../../data/rules.js'
 
 const ANATOMY = [
   { group: 'Rule owner, ID & business term', fields: [['Rule Owner', 'The accountable practitioner, usually the Data Steward.'], ['Rule ID', 'Unique identifier for tracking and traceability (DQ00001).'], ['Business Term', 'The functional data element the rule applies to.']] },
-  { group: 'Dimension rule & measurement', fields: [['Dimension Rule', 'Business-friendly description of the rule.'], ['Measurement Dimension', 'Completeness, accuracy, validity, consistency, uniqueness or timeliness.']] },
+  { group: 'Dimension rule & measurement', fields: [['Dimension Rule', 'Business-friendly description of the rule.'], ['Measurement Dimension', 'Completeness, accuracy, validity, consistency, uniqueness, timeliness or integrity.']] },
   { group: 'Acceptance thresholds', fields: [['Thresholds', 'Green: meets target (e.g. > 95%). Amber: monitor closely (80–95%). Red: remediate (< 80%).']] },
   { group: 'Profiling frequency & assets', fields: [['Profiling Frequency', 'How often the rule runs: per load, daily, weekly, monthly.'], ['Related Data Asset(s)', 'Tables, fields, calculated fields and upstream curated datasets.']] },
   { group: 'Technical rule & review date', fields: [['Technical Rule', 'The executable logic in Informatica CDQ (SQL-like expression).'], ['Last Review Date', 'Tracks the yearly review required by Standard 4.']] },
@@ -16,7 +16,7 @@ const ANATOMY = [
 const TYPES = [
   ['Field-level', 'One column, one record.', 'Importer TIN is not null on an import declaration'],
   ['Cross-field', 'Two or more columns in the same record.', 'Customs value = FOB + freight + insurance; buyer VAT required when invoice type = Standard'],
-  ['Cross-table / referential', 'A value must exist in another table.', 'HS code exists in the tariff in force on the declaration date'],
+  ['Cross-table / referential', 'A value must exist in another table (integrity).', 'Seller VAT number exists in the taxpayer registry; every declaration line has a header'],
   ['Cross-system', 'Same fact compared in two systems.', 'Output VAT in the return = VAT on the taxpayer’s e-invoices'],
   ['Aggregate / reasonableness', 'Totals or distributions within expected ranges.', 'Daily import VAT within ±15% of the 30-day average unless a holiday is flagged'],
   ['Timeliness / freshness', 'When data arrives versus when it should.', 'Simplified invoices reported within 24 hours; e-invoice gold table refreshed hourly'],
@@ -134,7 +134,7 @@ function RuleExamples() {
           </table>
         </div>
       </Section>
-      <Section title="Rule catalog" sub="Nineteen live-style rules across Customs, Tax and E-Invoicing (including FATOORA Phase 2 checks) and all six dimensions, with their latest scores." action={<Seg label="Filter by dimension" value={dim} onChange={setDim} options={['All', 'Completeness', 'Validity', 'Consistency', 'Uniqueness', 'Timeliness', 'Accuracy']} />}>
+      <Section title="Rule catalog" sub="Nineteen live-style rules across Customs, Tax and E-Invoicing (including FATOORA Phase 2 checks) and all seven dimensions, with their latest scores." action={<Seg label="Filter by dimension" value={dim} onChange={setDim} options={['All', 'Completeness', 'Validity', 'Consistency', 'Uniqueness', 'Timeliness', 'Accuracy', 'Integrity']} />}>
         <div className="table-wrap">
           <table className="t">
             <thead><tr><th>Rule ID</th><th>Domain</th><th>Business term</th><th>Rule</th><th>Dimension</th><th>Priority</th><th>Thresholds (G / A)</th><th>Technical rule</th><th className="num">Latest score</th></tr></thead>
@@ -161,6 +161,7 @@ const ROADMAP = [
   { d: 'Consistency', now: 95.4, target: 98, m: 'Q4 2027', cad: 'Half-yearly' },
   { d: 'Uniqueness', now: 99.6, target: 99.99, m: 'Q1 2027', cad: 'Quarterly' },
   { d: 'Timeliness', now: 95.2, target: 98, m: 'Q2 2027', cad: 'Yearly' },
+  { d: 'Integrity', now: 98.7, target: 99.9, m: 'Q3 2027', cad: 'Quarterly' },
 ]
 
 function Ring({ value, target }) {

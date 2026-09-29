@@ -43,7 +43,7 @@ export const SOURCES = [
     detect: 'Record-count and amount reconciliation per interface run; accuracy rule: every import VAT has a ledger ID.',
     prevent: 'Data contracts with explicit types and rounding; quarantine instead of silent drops; interface regression tests; conformance testing for taxpayer EGS units.',
     fix: 'Replay the missing records, add reconciliation that blocks the posting run on mismatch.',
-    dims: ['Consistency', 'Completeness', 'Accuracy'],
+    dims: ['Consistency', 'Integrity', 'Completeness', 'Accuracy'],
   },
   {
     id: 'dwh', icon: Database, name: 'Data warehouse & pipelines', stage: 3,
@@ -85,7 +85,7 @@ export const SOURCES = [
     detect: 'Completeness rule: a rate exists for every currency and calendar day; reconciliation of duty to the treasury ledger.',
     prevent: 'Govern exchange rates, tariff and port codes as CDEs with owners; fallback rules; one governed reference list per code set.',
     fix: 'Reprocess affected declarations; add a last-published-rate fallback and a missing-rate alert.',
-    dims: ['Completeness', 'Validity', 'Accuracy'],
+    dims: ['Completeness', 'Integrity', 'Validity', 'Accuracy'],
   },
 ]
 

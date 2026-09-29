@@ -35,7 +35,7 @@ const TERMS = [
   ['Data Steward', 'Business subject-matter expert who defines rules and drives issues to closure.'],
   ['DQ gate', 'A rule executed in a pipeline that stops or quarantines data failing a threshold.'],
   ['DQ score', 'Records passing a rule ÷ records evaluated, aggregated to element, asset, domain and enterprise.'],
-  ['Dimension', 'A lens for measuring quality: completeness, accuracy, validity, consistency, uniqueness, timeliness.'],
+  ['Dimension', 'One of seven lenses for measuring quality: completeness, accuracy, validity, consistency, uniqueness, timeliness, integrity.'],
   ['Issue registry', 'The single log of data quality issues with their evidence, owner, priority, root cause and resolution.'],
   ['Proactive DQ', 'Preventing defects through standards, validation, controls and change assessment.'],
   ['Reactive DQ', 'Detecting, investigating and repairing defects that already exist.'],
@@ -50,6 +50,7 @@ const QUIZ = [
   { q: 'Who approves a change to a data quality rule before the Custodian implements it?', o: ['Data Steward', 'Data Custodian', 'Data Owner'], a: 2 },
   { q: 'Output VAT in the return differs from VAT on the taxpayer’s e-invoices. Which dimension fails?', o: ['Consistency', 'Uniqueness', 'Timeliness'], a: 0 },
   { q: 'An invoice shows VAT of 105.00 on 1,000.00 at 15%. The format is fine. Which dimension fails?', o: ['Validity', 'Accuracy', 'Completeness'], a: 1 },
+  { q: 'A credit note refers to an original invoice UUID that does not exist anywhere. Which dimension fails?', o: ['Integrity', 'Timeliness', 'Accuracy'], a: 0 },
   { q: 'How often must data quality be baselined at minimum?', o: ['Monthly', 'Quarterly', 'Yearly'], a: 1 },
   { q: 'The revenue dashboard counts both original and amended VAT returns. The source of the issue is…', o: ['Data entry', 'Business change', 'BI query / report logic'], a: 2 },
   { q: 'A declaration in the warehouse has the wrong HS code because the broker submitted it wrong. Where should it be corrected?', o: ['In the warehouse', 'In FASAH, with the broker', 'In the report'], a: 1 },
@@ -82,7 +83,7 @@ export default function Glossary() {
         </div>
       </Section>
 
-      <Section title="Knowledge check" sub="Eight questions. Pick an answer to see if you got it right." action={
+      <Section title="Knowledge check" sub="Nine questions. Pick an answer to see if you got it right." action={
         <div className="row"><Pill tone={done === QUIZ.length ? (correct >= 6 ? 'good' : 'warn') : 'neutral'}>{correct} / {QUIZ.length} correct</Pill>{done > 0 && <button className="btn sm" onClick={() => setAns({})}>Reset</button>}</div>
       }>
         <div className="grid g2">

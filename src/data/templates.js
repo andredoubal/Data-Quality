@@ -69,7 +69,7 @@ export const TEMPLATES = [
       ['Business Term', 'Functional data element the rule applies to', 'Buyer VAT Number'],
       ['CDE Tier', 'Tier 1, Tier 2 or Standard', 'Tier 1'],
       ['Dimension Rule', 'Business-friendly description of the rule', 'Buyer VAT number must be populated (not a placeholder) on standard B2B tax invoices'],
-      ['Measurement Dimension', 'Completeness, Accuracy, Validity, Consistency, Uniqueness, Timeliness', 'Completeness'],
+      ['Measurement Dimension', 'Completeness, Accuracy, Validity, Consistency, Uniqueness, Timeliness, Integrity', 'Completeness'],
       ['Rule Priority', 'Business Critical, Business Disruptive, Informational', 'Business Disruptive'],
       ['Threshold: Green', 'Meets target at or above', '>= 98%'],
       ['Threshold: Amber', 'Monitor closely between', '94% - 98%'],

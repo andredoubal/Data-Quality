@@ -159,7 +159,7 @@ export default function Registry() {
       </Callout>
 
       {sel && <IssueDrawer issue={sel} onClose={() => setSel(null)} />}
-      {adding && <NewIssue onClose={() => setAdding(false)} onSave={(i) => { setRows([i, ...rows]); setAdding(false); setScope('All'); toast('Logged ' + i.id + ' (this session only)') }} nextId={`DQI-2026-0${125 + rows.length - ISSUES.length}`} />}
+      {adding && <NewIssue onClose={() => setAdding(false)} onSave={(i) => { setRows([i, ...rows]); setAdding(false); setScope('All'); toast('Logged ' + i.id + ' (this session only)') }} nextId={`DQI-2026-0${126 + rows.length - ISSUES.length}`} />}
       {toastNode}
     </>
   )
@@ -260,7 +260,7 @@ function NewIssue({ onClose, onSave, nextId }) {
         <div className="grid g2" style={{ gap: 10 }}>
           {pick('domain', 'Data domain', ['Customs', 'Tax', 'E-Invoicing'])}
           {field('element', 'Data element *')}
-          {pick('dim', 'Dimension', ['Completeness', 'Validity', 'Accuracy', 'Consistency', 'Uniqueness', 'Timeliness'])}
+          {pick('dim', 'Dimension', ['Completeness', 'Validity', 'Accuracy', 'Consistency', 'Uniqueness', 'Timeliness', 'Integrity'])}
           {pick('source', 'Suspected source', ['Business change', 'Data entry', 'Source system / integration', 'Data warehouse / pipeline', 'BI query / report logic', 'Migration & reference data'])}
         </div>
         {field('expected', 'Expected outcome *')}

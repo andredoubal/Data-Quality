@@ -18,19 +18,19 @@ const AREAS = [
   { a: 'Taxpayer Onboarding', d: 'E-Invoicing' },
 ]
 const DOMAINS = AREAS.map((x) => x.a)
-const DIMS = ['Completeness', 'Validity', 'Accuracy', 'Consistency', 'Uniqueness', 'Timeliness']
+const DIMS = ['Completeness', 'Validity', 'Accuracy', 'Consistency', 'Uniqueness', 'Timeliness', 'Integrity']
 const MONTHS = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep']
 
 // Latest score per data area x dimension (illustrative)
 const MATRIX = {
-  Declarations: [99.1, 98.4, 95.8, 97.4, 99.9, 98.9],
-  'Tariff & Classification': [99.8, 96.2, 97.0, 98.1, 99.9, 96.8],
-  'Trader Registry': [97.6, 88.0, 96.5, 95.9, 99.4, 94.2],
-  'Taxpayer Registration': [98.9, 99.9, 97.8, 96.7, 99.6, 97.3],
-  'VAT Returns': [99.4, 98.7, 96.1, 83.6, 99.9, 91.3],
-  Excise: [90.2, 97.5, 95.4, 94.9, 99.7, 93.8],
-  'E-Invoices': [95.1, 99.1, 97.7, 99.3, 99.2, 93.9],
-  'Taxpayer Onboarding': [93.0, 98.2, 96.6, 97.1, 99.5, 95.5],
+  Declarations: [99.1, 98.4, 95.8, 97.4, 99.9, 98.9, 99.9],
+  'Tariff & Classification': [99.8, 96.2, 97.0, 98.1, 99.9, 96.8, 99.6],
+  'Trader Registry': [97.6, 88.0, 96.5, 95.9, 99.4, 94.2, 96.8],
+  'Taxpayer Registration': [98.9, 99.9, 97.8, 96.7, 99.6, 97.3, 99.2],
+  'VAT Returns': [99.4, 98.7, 96.1, 83.6, 99.9, 91.3, 98.4],
+  Excise: [90.2, 97.5, 95.4, 94.9, 99.7, 93.8, 97.9],
+  'E-Invoices': [95.1, 99.1, 97.7, 99.3, 99.2, 93.9, 97.6],
+  'Taxpayer Onboarding': [93.0, 98.2, 96.6, 97.1, 99.5, 95.5, 98.9],
 }
 const CDES = { Declarations: [9, 7], 'Tariff & Classification': [4, 3], 'Trader Registry': [4, 3], 'Taxpayer Registration': [7, 6], 'VAT Returns': [8, 6], Excise: [5, 3], 'E-Invoices': [10, 8], 'Taxpayer Onboarding': [4, 3] }
 const RULE_COUNT = { Declarations: 38, 'Tariff & Classification': 14, 'Trader Registry': 11, 'Taxpayer Registration': 19, 'VAT Returns': 27, Excise: 12, 'E-Invoices': 41, 'Taxpayer Onboarding': 9 }

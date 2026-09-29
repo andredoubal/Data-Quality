@@ -6,6 +6,7 @@ export const SCORING = [
   { dim: 'Timeliness', logic: '% of records received or updated within the expected time frame', vars: ['A = records received or updated within the time frame', 'B = records expected'], eq: '(A ÷ B) × 100', kind: 'pass2' },
   { dim: 'Consistency', logic: '% of values that agree across sources', vars: ['A = values of the same column that agree across sources', 'B = values of that column compared across sources'], eq: '(A ÷ B) × 100', kind: 'pass2' },
   { dim: 'Uniqueness', logic: '% of values that are unique in the column', vars: ['A = unique values in columns with a unique constraint', 'B = total rows', 'C = columns with a unique constraint'], eq: '(A ÷ (B × C)) × 100', kind: 'pass' },
+  { dim: 'Integrity', logic: '% of references and links that resolve correctly', vars: ['A = records whose references resolve (parent exists, chain unbroken)', 'B = records that carry a reference'], eq: '(A ÷ B) × 100', kind: 'pass2' },
   { dim: 'Accuracy', logic: '% of values that conform to a business rule or trusted source', vars: ['A = values that pass the business rules', 'B = total rows', 'C = columns with business rules applied'], eq: '(A ÷ (B × C)) × 100', kind: 'pass' },
 ]
 
@@ -13,7 +14,6 @@ export const LIBRARY = {
   Completeness: [
     ['Mandatory fields', 'All fields flagged as mandatory or critical must have values.', 'Importer TIN, HS code and customs value on every FASAH import declaration line.'],
     ['Missing values count', 'Periodically count missing values to spot patterns in what is missing.', 'Weekly count of blank buyer VAT numbers by EGS vendor shows one ERP causing 70% of gaps.'],
-    ['Referential completeness', 'Referenced records must exist (foreign keys).', 'Every seller VAT number on a FATOORA invoice exists in the ZATCA taxpayer registry.'],
     ['Data collection completeness', 'All expected sources or channels have delivered.', 'Every customs port (land, sea, air) sent its daily FASAH declaration feed; one port missing means investigate.'],
     ['Time-series completeness', 'No gaps in sequential data.', 'A SAMA exchange rate exists for every currency and every calendar day, holidays included.'],
   ],
@@ -22,7 +22,6 @@ export const LIBRARY = {
     ['Range constraints', 'Values fall inside allowed ranges.', 'VAT rate is 15% (standard) or 0% (zero-rated / exempt); gross weight > 0 kg; invoice issue date not in the future.'],
     ['Enumeration validation', 'Fields with a fixed list only contain allowed values.', 'Invoice type code is 388 (tax invoice), 381 (credit note) or 383 (debit note); HS code in the tariff in force.'],
     ['Format & pattern', 'Values follow the required length and pattern.', 'VAT number: 15 digits, starts and ends with 3 (^3[0-9]{13}3$); HS code: 12 digits.'],
-    ['Relationship integrity', 'Relationships between entities are maintained.', 'Every declaration line belongs to an existing declaration header in FASAH.'],
   ],
   Timeliness: [
     ['Data arrival time', 'Time for data to arrive from source to target within a threshold.', 'FATOORA invoices land in the warehouse within 1 hour of clearance.'],
@@ -44,6 +43,13 @@ export const LIBRARY = {
     ['Consistent key generation', 'Key-generating mechanisms work without error.', 'Each EGS unit increments its invoice counter (ICV) without repeats or resets.'],
     ['Redundancy checks', 'No redundant entries or fields.', 'One active VAT registration per commercial registration (CR) number.'],
     ['Historical uniqueness', 'Records stay unique across history.', 'A deregistered VAT number is never reissued to another taxpayer.'],
+  ],
+  Integrity: [
+    ['Referential integrity', 'Every foreign key points to an existing parent record.', 'Every seller VAT number on a FATOORA invoice exists in the ZATCA taxpayer registry.'],
+    ['Orphan records', 'No child records without a parent.', 'Every FASAH declaration line belongs to an existing declaration header.'],
+    ['Document references', 'Documents that refer to other documents point to real ones.', 'Credit and debit notes (381/383) reference an original invoice UUID from the same seller.'],
+    ['Chain integrity', 'Linked sequences are unbroken and untampered.', 'Each invoice\u2019s previous invoice hash (PIH) equals the hash of the device\u2019s previous invoice.'],
+    ['Lineage integrity', 'Records survive each hop from source to target.', 'Declarations and import VAT totals match at FASAH, warehouse landing, gold and the ZATCA tax ledger.'],
   ],
   Accuracy: [
     ['Verification checks', 'Verify against trusted sources or benchmarks.', 'Importer CR number verified against the Ministry of Commerce register.'],
