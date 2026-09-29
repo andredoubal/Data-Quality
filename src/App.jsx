@@ -104,7 +104,7 @@ export default function App() {
     <div className="shell">
       <div className="topbar">
         <button aria-label="Open navigation" onClick={() => setOpen(true)}><Menu size={22} /></button>
-        <span className="brand-name">Data Quality Academy</span>
+        <span className="brand-name">ZATCA Data Quality Academy</span>
       </div>
       {open && <div className="drawer-back" style={{ zIndex: 45, background: 'transparent' }} onClick={() => setOpen(false)} />}
       <aside className={'rail' + (open ? ' open' : '')}>
@@ -112,7 +112,7 @@ export default function App() {
           <div className="brand-mark"><Gauge size={20} /></div>
           <div>
             <div className="brand-name">Data Quality Academy</div>
-            <div className="brand-sub">Learn · Apply · Improve</div>
+            <div className="brand-sub">ZATCA · Customs · Tax · E-Invoicing</div>
           </div>
           {open && (
             <button className="btn ghost sm" style={{ marginLeft: 'auto', color: '#fff' }} aria-label="Close navigation" onClick={() => setOpen(false)}>

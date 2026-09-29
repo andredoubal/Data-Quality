@@ -4,11 +4,18 @@ import { PageHead, Section, Pill } from '../components/ui.jsx'
 
 const TERMS = [
   ['CIF / customs value', 'Value of imported goods for duty purposes: cost (FOB) + insurance + freight.'],
-  ['Clearance (e-invoicing)', 'Real-time validation of a standard B2B invoice by the E-Invoicing Platform before it is shared with the buyer.'],
-  ['Reporting (e-invoicing)', 'Submission of a simplified B2C invoice to the E-Invoicing Platform after issue, within 24 hours.'],
+  ['Clearance (e-invoicing)', 'Real-time validation and stamping of a standard (B2B) tax invoice by FATOORA before it is shared with the buyer.'],
+  ['Reporting (e-invoicing)', 'Submission of a simplified B2C invoice to FATOORA after issue, within 24 hours.'],
   ['EGS unit', 'E-invoice generation solution: the taxpayer’s device or ERP that creates and submits e-invoices.'],
   ['HS code', 'Harmonized System tariff code classifying goods; extended nationally to 12 digits.'],
-  ['TIN / VAT number', 'Taxpayer identification number and VAT registration number identifying a taxpayer across Customs, Tax and E-Invoicing.'],
+  ['TIN / VAT number', 'Taxpayer identifiers used across Customs, Tax and E-Invoicing. The Saudi VAT registration number has 15 digits and starts and ends with 3 (e.g., 310122334400003).'],
+  ['ZATCA', 'Zakat, Tax and Customs Authority: the authority that owns the Customs, Tax and E-Invoicing data in this portal.'],
+  ['FASAH', 'The Saudi customs single window where import, export and transit declarations are submitted and cleared.'],
+  ['FATOORA', 'ZATCA\u2019s e-invoicing platform: clears standard (B2B) tax invoices and receives reported simplified (B2C) invoices.'],
+  ['CSID', 'Cryptographic Stamp Identifier: the certificate ZATCA issues to each onboarded EGS unit so it can sign e-invoices.'],
+  ['Invoice hash / PIH', 'Each e-invoice carries its own hash and the previous invoice hash (PIH), chaining a device\u2019s invoices so gaps or tampering can be detected.'],
+  ['QR code (e-invoice)', 'Mandatory code on e-invoices carrying seller name, VAT number, timestamp, totals and the cryptographic stamp.'],
+  ['SAMA', 'Saudi Central Bank; publishes the exchange rates used to convert foreign-currency customs values.'],
   ['Invoice UUID', 'Universally unique identifier of an e-invoice, used to detect duplicates.'],
   ['Amended return', 'A corrected VAT or excise return that replaces the original for the same period.'],
   ['Acceptance threshold', 'The pass-rate levels that decide whether a rule result is fine (green), needs monitoring (amber) or needs remediation (red).'],
@@ -39,13 +46,13 @@ const TERMS = [
 ]
 
 const QUIZ = [
-  { q: 'The E-Invoicing Platform rejects an invoice with a missing buyer VAT number at clearance. This is…', o: ['Reactive data quality', 'Proactive data quality', 'Profiling'], a: 1 },
+  { q: 'FATOORA rejects an invoice with a missing buyer VAT number at clearance. This is…', o: ['Reactive data quality', 'Proactive data quality', 'Profiling'], a: 1 },
   { q: 'Who approves a change to a data quality rule before the Custodian implements it?', o: ['Data Steward', 'Data Custodian', 'Data Owner'], a: 2 },
   { q: 'Output VAT in the return differs from VAT on the taxpayer’s e-invoices. Which dimension fails?', o: ['Consistency', 'Uniqueness', 'Timeliness'], a: 0 },
   { q: 'An invoice shows VAT of 105.00 on 1,000.00 at 15%. The format is fine. Which dimension fails?', o: ['Validity', 'Accuracy', 'Completeness'], a: 1 },
   { q: 'How often must data quality be baselined at minimum?', o: ['Monthly', 'Quarterly', 'Yearly'], a: 1 },
   { q: 'The revenue dashboard counts both original and amended VAT returns. The source of the issue is…', o: ['Data entry', 'Business change', 'BI query / report logic'], a: 2 },
-  { q: 'A declaration in the warehouse has the wrong HS code because the broker submitted it wrong. Where should it be corrected?', o: ['In the warehouse', 'In the Customs Clearance System, with the broker', 'In the report'], a: 1 },
+  { q: 'A declaration in the warehouse has the wrong HS code because the broker submitted it wrong. Where should it be corrected?', o: ['In the warehouse', 'In FASAH, with the broker', 'In the report'], a: 1 },
   { q: 'New HS codes from the annual tariff update are missing in the warehouse. Which source is this?', o: ['Business & regulatory change', 'BI query', 'Data entry'], a: 0 },
 ]
 

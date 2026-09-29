@@ -53,6 +53,18 @@ export default function Roles() {
         </div>
       </Section>
 
+      <Section title="The Data Quality Office" sub="A small central team runs the DQ request process across Customs, Tax and E-Invoicing (see the DQ request lifecycle in the Framework chapter).">
+        <div className="grid g3">
+          {[
+            ['Head of DQ / DQ Manager', 'Prioritizes submitted requests, schedules DQ projects, oversees assessments, gives direction for root cause analysis and reviews remediation plans.'],
+            ['DQ Profiler', 'Confirms the scope and data access, runs and publishes profiling, works with stakeholders on root causes and helps write remediation plans. Works closely with the Data Custodian.'],
+            ['Requestor', 'Any business team (e.g., Revenue Analytics, Risk Management) that submits a DQ request through the Intake Form, reviews results and takes the remediation plan to funding approval.'],
+          ].map(([t, d]) => (
+            <div key={t} className="card flat stack" style={{ gap: 6 }}><h4>{t}</h4><p className="small" style={{ color: 'var(--ink-2)' }}>{d}</p></div>
+          ))}
+        </div>
+      </Section>
+
       <Section title="RACI matrix" sub="R = does the work · A = signs off, one per activity · C = gives input · I = kept informed.">
         <div className="legend">
           {Object.entries(RACI_LABEL).map(([k, v]) => (
@@ -91,7 +103,7 @@ export default function Roles() {
       </Section>
 
       <Callout title="The golden rule of ownership">
-        Data is fixed where it is created. The Custodian can detect and report a problem in the warehouse, but the correction happens in the Customs Clearance System, Tax Administration System or E-Invoicing Platform (or with the broker or taxpayer who submitted it), approved by the Data Owner.
+        Data is fixed where it is created. The Custodian can detect and report a problem in the warehouse, but the correction happens in FASAH, the ZATCA tax system or FATOORA (or with the broker or taxpayer who submitted it), approved by the Data Owner.
       </Callout>
     </>
   )

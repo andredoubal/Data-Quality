@@ -280,9 +280,10 @@ svg text { font-family: var(--font-body); }
 
 /* Two-column layouts that stack on small screens */
 .split { display: grid; gap: 16px; grid-template-columns: minmax(220px, 280px) minmax(0, 1fr); align-items: start; }
+.split.narrow { grid-template-columns: minmax(170px, 210px) minmax(0, 1fr); }
 .split-wide { display: grid; gap: 16px; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
 .roadmap-row { display: grid; gap: 18px; grid-template-columns: minmax(150px, 210px) minmax(0, 1fr); align-items: start; }
 @media (max-width: 900px) {
-  .split, .split-wide, .roadmap-row { grid-template-columns: minmax(0, 1fr); }
+  .split, .split.narrow, .split-wide, .roadmap-row { grid-template-columns: minmax(0, 1fr); }
   .split > nav { position: static !important; }
 }

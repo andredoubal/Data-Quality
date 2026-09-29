@@ -107,8 +107,9 @@ export default function Issues({ go }) {
               ))}
             </div>
           </Section>
+          <RequestMatrix />
           <Callout title="Severity vs. priority">
-            <b>Severity</b> describes how bad the impact is. <b>Priority</b> decides the order we work in, combining severity with scale, criticality, compliance risk and urgency. A severe issue affecting 3 records before year-end may rank below a moderate one affecting every payslip next week.
+            <b>Severity</b> describes how bad the impact is. <b>Priority</b> decides the order we work in, combining severity with scale, criticality, compliance risk and urgency. A severe issue affecting 3 declarations may rank below a moderate one affecting every e-invoice cleared through FATOORA next week.
           </Callout>
         </>
       }
@@ -173,5 +174,99 @@ function PriorityLab() {
         </div>
       </Section>
     </>
+  )
+}
+
+const FACTORS = [
+  ['Requestor-assigned priority', 'Priority given by the requestor on the intake form.'],
+  ['Benefits', 'Revenue protected, faster clearance at FASAH, fewer taxpayer disputes, better risk targeting.'],
+  ['Available funding', 'Budget approved for the remediation or project.'],
+  ['Data sensitivity', 'NDMO classification (Top Secret / Secret / Restricted / Public) and impact of poor-quality taxpayer data.'],
+  ['Program dependency', 'Needed by a large program, e.g., the next FATOORA integration wave or a FASAH release.'],
+  ['External requirements', 'VAT and customs law, GCC obligations, international reporting (WCO, OECD).'],
+  ['Resource availability', 'Stewards, profilers, source system teams and SMEs available to do the work.'],
+]
+const VALUE_C = ['Breadth of use', 'Use cases supported', 'Strategic alignment', 'Financial benefit']
+const EFFORT_C = ['Source system complexity', 'Number of data elements', 'SME availability (5 = scarce)', 'Budget gap (5 = unfunded)', 'Timeline pressure']
+const REQUESTS = [
+  { id: 'R1', t: 'Reconcile output VAT to FATOORA e-invoices', v: 4.8, e: 2.2 },
+  { id: 'R2', t: 'Cleanse legacy trader registry in FASAH', v: 2.1, e: 4.2 },
+  { id: 'R3', t: 'SAMA exchange rate holiday fallback', v: 4.2, e: 1.4 },
+  { id: 'R4', t: 'Re-classify generic HS codes (e-commerce)', v: 4.4, e: 4.1 },
+  { id: 'R5', t: 'Standardize port codes to UN/LOCODE', v: 1.8, e: 1.6 },
+  { id: 'R6', t: 'Merge duplicate VAT registrations per CR', v: 3.6, e: 3.4 },
+]
+const quad = (v, e) => (v >= 3 ? (e >= 3 ? 'Prioritize' : 'Execute') : e >= 3 ? 'Defer' : 'Delay & schedule')
+const QTONE = { Execute: 'good', Prioritize: 'accent', 'Delay & schedule': 'warn', Defer: 'neutral' }
+
+function RequestMatrix() {
+  const [val, setVal] = useState([4, 3, 4, 3])
+  const [eff, setEff] = useState([2, 2, 3, 2, 3])
+  const v = val.reduce((a, b) => a + b, 0) / val.length
+  const e = eff.reduce((a, b) => a + b, 0) / eff.length
+  const S = 300, pad = 34
+  // x axis: effort High (left) to Low (right); y axis: value Low (bottom) to High (top)
+  const X = (ef) => pad + ((5 - ef) / 4) * (S - pad - 10)
+  const Y = (va) => 10 + ((5 - va) / 4) * (S - pad - 10)
+  const mid = { x: X(3), y: Y(3) }
+  const slider = (label, arr, set, i, id) => (
+    <label key={label} className="field" htmlFor={id}>
+      <span className="row between"><span>{label}</span><b>{arr[i]}</b></span>
+      <input id={id} type="range" min="1" max="5" value={arr[i]} onChange={(ev) => set(arr.map((x, k) => (k === i ? +ev.target.value : x)))} />
+    </label>
+  )
+  return (
+    <Section title="DQ request prioritization: value vs. effort" sub="For remediation requests and DQ projects competing for the same team, score weighted value against weighted effort and place each request on the matrix.">
+      <div className="card tint stack" style={{ gap: 8 }}>
+        <h4>Prioritization factors</h4>
+        <div className="grid g2" style={{ gap: 8 }}>
+          {FACTORS.map(([k, d]) => <p key={k} className="small"><b>{k}:</b> <span style={{ color: 'var(--ink-2)' }}>{d}</span></p>)}
+        </div>
+      </div>
+      <div className="grid g2" style={{ alignItems: 'start' }}>
+        <div className="card stack" style={{ gap: 12 }}>
+          <div className="small muted">Score a new request, e.g. <b>validate QR codes on simplified invoices</b>. 1 = low, 5 = high.</div>
+          <h4>Weighted value / impact · {v.toFixed(1)}</h4>
+          {VALUE_C.map((c, i) => slider(c, val, setVal, i, 'rv-' + i))}
+          <h4>Weighted effort / complexity · {e.toFixed(1)}</h4>
+          {EFFORT_C.map((c, i) => slider(c, eff, setEff, i, 're-' + i))}
+          <div className="row"><span className="small">Recommendation:</span><Pill tone={QTONE[quad(v, e)]}>{quad(v, e)}</Pill></div>
+        </div>
+        <div className="card stack" style={{ alignItems: 'center' }}>
+          <svg viewBox={`0 0 ${S} ${S}`} width="100%" style={{ maxWidth: 420 }} role="img" aria-label="Value versus effort matrix">
+            <rect x={pad} y="10" width={S - pad - 10} height={S - pad - 10} fill="var(--surface)" stroke="var(--line-strong)" />
+            <rect x={mid.x} y="10" width={S - 10 - mid.x} height={mid.y - 10} fill="var(--good-soft)" />
+            <line x1={mid.x} x2={mid.x} y1="10" y2={S - pad} stroke="var(--line-strong)" strokeWidth="2" />
+            <line x1={pad} x2={S - 10} y1={mid.y} y2={mid.y} stroke="var(--line-strong)" strokeWidth="2" />
+            {[['Prioritize', (pad + mid.x) / 2, mid.y - 8], ['Execute', (mid.x + S - 10) / 2, mid.y - 8], ['Defer', (pad + mid.x) / 2, S - pad - 10], ['Delay & schedule', (mid.x + S - 10) / 2, S - pad - 10]].map(([t, x, y]) => (
+              <text key={t} x={x} y={y} textAnchor="middle" fontSize="11" fontWeight="700" fill="var(--ink-2)">{t}</text>
+            ))}
+            <text x={pad} y={S - pad + 16} fontSize="10" fill="var(--muted)">High</text>
+            <text x={S - 10} y={S - pad + 16} fontSize="10" fill="var(--muted)" textAnchor="end">Low</text>
+            <text x={(pad + S) / 2} y={S - 4} fontSize="10.5" fill="var(--ink-2)" textAnchor="middle">Weighted effort / complexity</text>
+            <text x="12" y={(S - pad) / 2} fontSize="10.5" fill="var(--ink-2)" textAnchor="middle" transform={`rotate(-90 12 ${(S - pad) / 2})`}>Weighted value / impact</text>
+            {REQUESTS.map((r) => (
+              <g key={r.id}>
+                <circle cx={X(r.e)} cy={Y(r.v)} r="10" fill="var(--s1)" stroke="var(--surface)" strokeWidth="2"><title>{r.t}</title></circle>
+                <text x={X(r.e)} y={Y(r.v) + 3.5} textAnchor="middle" fontSize="9" fontWeight="700" fill="#ffffff">{r.id}</text>
+              </g>
+            ))}
+            <circle cx={X(e)} cy={Y(v)} r="11" fill="var(--s2)" stroke="var(--surface)" strokeWidth="2" />
+            <text x={X(e)} y={Y(v) + 3.5} textAnchor="middle" fontSize="9" fontWeight="700" fill="#ffffff">New</text>
+          </svg>
+          <div className="legend"><span><i style={{ background: 'var(--s1)', borderRadius: '50%' }} />Backlog request</span><span><i style={{ background: 'var(--s2)', borderRadius: '50%' }} />Request you are scoring</span></div>
+        </div>
+      </div>
+      <div className="table-wrap">
+        <table className="t">
+          <thead><tr><th>#</th><th>Request</th><th className="num">Value</th><th className="num">Effort</th><th>Decision</th></tr></thead>
+          <tbody>
+            {REQUESTS.map((r) => (
+              <tr key={r.id}><td className="mono">{r.id}</td><td>{r.t}</td><td className="num">{r.v.toFixed(1)}</td><td className="num">{r.e.toFixed(1)}</td><td><Pill tone={QTONE[quad(r.v, r.e)]}>{quad(r.v, r.e)}</Pill></td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Section>
   )
 }

@@ -104,9 +104,9 @@ export default function Home({ go }) {
 }
 
 const DOMAINS = [
-  { icon: Ship, name: 'Customs', data: 'Declarations, HS codes, customs value, country of origin, traders' },
-  { icon: Landmark, name: 'Tax', data: 'Taxpayer registration, VAT & excise returns, payments and refunds' },
-  { icon: Receipt, name: 'E-Invoicing', data: 'Cleared and reported e-invoices, seller & buyer VAT, device onboarding' },
+  { icon: Ship, name: 'Customs · FASAH', data: 'Declarations, 12-digit HS codes, customs value, country of origin, importers and brokers' },
+  { icon: Landmark, name: 'Tax · ZATCA tax system', data: 'VAT registration (15-digit VAT numbers), VAT & excise returns, payments and refunds' },
+  { icon: Receipt, name: 'E-Invoicing · FATOORA', data: 'Cleared and reported e-invoices, QR codes, invoice hashes, EGS onboarding (CSIDs)' },
 ]
 
 function DomainPanel() {

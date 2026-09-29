@@ -100,7 +100,7 @@ export default function Templates() {
       </div>
 
       <Callout title="Where the templates fit">
-        CDE & Business Term → Rule Definition → Profiling & Baseline → Issue Log → Priority Scoring → RCA → Remediation Plan → DQ Scorecard → Quarterly DG Report. The Rule Change Request and Data Impact Assessment keep rules and data aligned when things change.
+        DQ Request Intake → Request Prioritization → CDE & Business Term → Rule Definition → Profiling & Baseline → Issue Log → Priority Scoring → RCA → Remediation Plan → DQ Scorecard → Quarterly DG Report. The Rule Change Request and Data Impact Assessment keep rules and data aligned when things change.
       </Callout>
       {toastNode}
     </>

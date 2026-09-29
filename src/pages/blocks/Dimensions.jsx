@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { Ruler, Target, CircleDashed, GitCompare, BadgeCheck, Fingerprint, Timer } from 'lucide-react'
 import Block from '../../components/Block.jsx'
-import { Section, StepFlow, Callout } from '../../components/ui.jsx'
+import { Section, StepFlow, Callout, Pill } from '../../components/ui.jsx'
+import { SCORING, LIBRARY } from '../../data/ruleLibrary.js'
 
 export const DIMENSIONS = [
   { id: 'Accuracy', icon: Target, q: 'Is the value in a data field correct?', measure: '% of values that match an authoritative source or recalculation', rule: 'Invoice VAT amount = taxable amount × VAT rate; customs value = FOB + freight + insurance', fail: 'VAT of 105.00 on a taxable amount of 1,000.00 at 15% (should be 150.00)' },
   { id: 'Completeness', icon: CircleDashed, q: 'Is all necessary data present, and are mandatory fields populated for all records?', measure: '% of records where the field is populated', rule: 'Importer TIN must not be null on import declarations', fail: '3,100 courier declarations without an importer TIN' },
-  { id: 'Consistency', icon: GitCompare, q: 'Does the same fact show the same value across systems or tables?', measure: '% of records where values agree across systems', rule: 'Output VAT in the return reconciles to VAT on the taxpayer’s e-invoices', fail: 'Return declares 2.1M output VAT; e-invoices total 2.6M' },
-  { id: 'Validity', icon: BadgeCheck, q: 'Do values fall within the formats, ranges and code lists defined by the business?', measure: '% of values conforming to format, range or allowed list', rule: 'HS code exists in the tariff in force; VAT number is 15 digits with a valid check digit', fail: 'Retired HS code used after 1 January; VAT number with 14 digits' },
+  { id: 'Consistency', icon: GitCompare, q: 'Does the same fact show the same value across systems or tables?', measure: '% of records where values agree across systems', rule: 'Output VAT in the return reconciles to VAT on the taxpayer’s e-invoices', fail: 'Return declares SAR 2.1M output VAT; e-invoices total SAR 2.6M' },
+  { id: 'Validity', icon: BadgeCheck, q: 'Do values fall within the formats, ranges and code lists defined by the business?', measure: '% of values conforming to format, range or allowed list', rule: 'HS code exists in the tariff in force; VAT number is 15 digits starting and ending with 3', fail: 'Retired HS code used after 1 January; VAT number with 14 digits' },
   { id: 'Uniqueness', icon: Fingerprint, q: 'Is each real-world record captured once?', measure: '% of records with no duplicates on the business key', rule: 'One record per e-invoice UUID; one active VAT registration per commercial registration', fail: 'Same invoice UUID loaded twice after a batch replay' },
   { id: 'Timeliness', icon: Timer, q: 'Is the data submitted and available when it should be?', measure: '% of records received within the agreed deadline', rule: 'Simplified invoices reported within 24 hours; VAT returns filed by the due date', fail: 'Retail POS invoices reported 52 hours after issue' },
 ]
@@ -67,6 +68,7 @@ export default function Dimensions({ go }) {
         </Section>
       }
       framework={
+        <>
         <Section title="The six dimensions" sub="Definition, how it's measured, an example rule and what failure looks like in our data.">
           <div className="grid g3">
             {DIMENSIONS.map((d) => {
@@ -85,6 +87,9 @@ export default function Dimensions({ go }) {
             })}
           </div>
         </Section>
+          <ScoringLogic />
+          <RuleLibrary />
+        </>
       }
       example={<DimensionLab />}
     />
@@ -136,5 +141,90 @@ function DimensionLab() {
         A record can pass five dimensions and still fail the sixth. That's why each CDE is measured on several dimensions, and why accuracy (the hardest to automate) needs a recalculation or a trusted reference.
       </Callout>
     </>
+  )
+}
+
+function ScoringLogic() {
+  const [dim, setDim] = useState('Completeness')
+  const [v, setV] = useState({ A: 3100, B: 412880, C: 3 })
+  const sc = SCORING.find((x) => x.dim === dim)
+  const pct = sc.kind === 'fail' ? (1 - v.A / (v.B * v.C)) * 100 : sc.kind === 'pass' ? (v.A / (v.B * v.C)) * 100 : (v.A / v.B) * 100
+  const presets = {
+    Completeness: { A: 3100, B: 412880, C: 3, note: '3 mandatory columns (importer TIN, HS code, customs value) on 412,880 FASAH declarations; 3,100 nulls.' },
+    Validity: { A: 41200, B: 842000, C: 2, note: '2 format rules (seller and buyer VAT number) on 842,000 standard invoices; 41,200 values break the format.' },
+    Timeliness: { A: 2240000, B: 2385000, C: 1, note: '2,385,000 simplified invoices expected this week; 2,240,000 reported within 24 hours.' },
+    Consistency: { A: 71430, B: 73300, C: 1, note: '73,300 taxpayer-periods compared (VAT return vs FATOORA); 71,430 agree within 2%.' },
+    Uniqueness: { A: 2431960, B: 2450000, C: 1, note: '2,450,000 invoice UUIDs loaded; 2,431,960 are unique.' },
+    Accuracy: { A: 2393650, B: 2450000, C: 1, note: '2,450,000 invoices checked for VAT = taxable × 15%; 2,393,650 pass.' },
+  }
+  const pick = (d) => { setDim(d); const p = presets[d]; setV({ A: p.A, B: p.B, C: p.C }) }
+  const usesC = sc.vars.length === 3
+  return (
+    <Section title="How each dimension is scored" sub="Scoring logic and equation for every dimension. Pick one to try the calculation with a ZATCA example.">
+      <div className="table-wrap">
+        <table className="t navy-head">
+          <thead><tr><th>Dimension</th><th>Scoring logic</th><th>Variables</th><th>Score %</th></tr></thead>
+          <tbody>
+            {SCORING.map((x) => (
+              <tr key={x.dim} className="clickable" onClick={() => pick(x.dim)} style={x.dim === dim ? { background: 'var(--accent-soft)' } : {}}>
+                <td style={{ fontWeight: 600 }}>{x.dim}</td><td className="small">{x.logic}</td>
+                <td className="small"><ul className="bullets">{x.vars.map((t) => <li key={t}>{t}</li>)}</ul></td>
+                <td className="mono small" style={{ whiteSpace: 'nowrap' }}>{x.eq}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="card grid g2" style={{ alignItems: 'center' }}>
+        <div className="stack" style={{ gap: 10 }}>
+          <div className="row" style={{ gap: 6 }}>{SCORING.map((x) => <button key={x.dim} className={'btn sm' + (dim === x.dim ? ' primary' : '')} onClick={() => pick(x.dim)}>{x.dim}</button>)}</div>
+          <p className="small muted">{presets[dim].note}</p>
+          <div className="grid g3" style={{ gap: 10 }}>
+            {['A', 'B', ...(usesC ? ['C'] : [])].map((k) => (
+              <label key={k} className="field" htmlFor={'sc-' + k}>{k}
+                <input id={'sc-' + k} className="input" type="number" min="0" value={v[k]} onChange={(e) => setV({ ...v, [k]: Math.max(0, +e.target.value) })} />
+              </label>
+            ))}
+          </div>
+        </div>
+        <div className="stack" style={{ alignItems: 'center', textAlign: 'center', gap: 6 }}>
+          <span className="mono small muted">{sc.eq}</span>
+          <span className="big-num" style={{ fontSize: '3rem' }}>{Number.isFinite(pct) ? pct.toFixed(2) : '—'}%</span>
+          <span className="small muted">{dim} score</span>
+        </div>
+      </div>
+      <Callout title="Keep the direction right">
+        Completeness and validity count the <b>failures</b> (A), so the score is 100 minus the failure rate. Timeliness, consistency, uniqueness and accuracy count the <b>passes</b>, so the score is the pass rate. Mixing the two up turns a 99% score into 1%.
+      </Callout>
+    </Section>
+  )
+}
+
+function RuleLibrary() {
+  const [dim, setDim] = useState('Completeness')
+  return (
+    <Section title="Rule library by dimension" sub="Standard rule patterns for each dimension, each with a ZATCA example. Use them as a starting point when writing rules.">
+      <div className="split narrow">
+        <div className="card stack" style={{ gap: 4, padding: 10 }}>
+          <div className="eyebrow" style={{ padding: '4px 8px', color: 'var(--muted)' }}>DQ dimensions</div>
+          {Object.keys(LIBRARY).map((d) => (
+            <button key={d} className="btn ghost" onClick={() => setDim(d)} style={{ justifyContent: 'space-between', background: dim === d ? 'var(--navy)' : 'transparent', color: dim === d ? '#fff' : 'var(--ink)', fontWeight: dim === d ? 600 : 500 }}>
+              {d}<span className="mono xs" style={{ opacity: 0.7 }}>{LIBRARY[d].length}</span>
+            </button>
+          ))}
+        </div>
+        <div className="table-wrap">
+          <table className="t navy-head">
+            <thead><tr><th style={{ width: 36 }}>#</th><th>Rule pattern</th><th>What it checks</th><th>ZATCA example</th></tr></thead>
+            <tbody>
+              {LIBRARY[dim].map(([n, d, e], i) => (
+                <tr key={n}><td className="mono" style={{ color: 'var(--accent-ink)', fontWeight: 600 }}>{i + 1}</td><td style={{ fontWeight: 600, minWidth: 150 }}>{n}</td><td className="small" style={{ color: 'var(--ink-2)', minWidth: 200 }}>{d}</td><td className="small" style={{ minWidth: 240 }}>{e}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div className="row" style={{ gap: 6 }}><Pill tone="accent">Tip</Pill><span className="small">Some teams track <b>Integrity</b> (referential integrity) as a seventh dimension. Here it sits under Validity (relationship integrity) and Completeness (referential completeness).</span></div>
+    </Section>
   )
 }

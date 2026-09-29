@@ -24,7 +24,7 @@ const FISH = [
 const WHYS = [
   ['Why is July customs duty on the dashboard 4% below the treasury ledger?', 'Because 1,240 foreign-currency declarations were converted to local currency at 0.'],
   ['Why were they converted at 0?', 'Because the exchange rate table had no rate for their declaration dates, and the join defaults a missing rate to 0.'],
-  ['Why was there no rate for those dates?', 'Because the central bank feed publishes nothing on public holidays, and those declarations were lodged on a holiday.'],
+  ['Why was there no rate for those dates?', 'Because the SAMA (Saudi Central Bank) feed publishes nothing on public holidays, and those declarations were lodged on a holiday.'],
   ['Why didn\u2019t the pipeline handle that?', 'Because it has no fallback to the last published rate and no alert when a day\u2019s rates are missing.'],
   ['Why was that never built?', 'Because exchange rates were never governed as a CDE: no owner, no rules, no monitoring. \u2190 Root cause'],
 ]

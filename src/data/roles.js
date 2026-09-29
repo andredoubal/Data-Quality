@@ -65,7 +65,7 @@ export const ROLES = [
     short: 'Source System Team',
     name: 'Source System Team',
     color: 'var(--s5)',
-    who: 'Team that runs an operational system where data is created: the Customs Clearance System, the Tax Administration System or the E-Invoicing Platform.',
+    who: 'Team that runs an operational system where data is created: FASAH (customs clearance), the ZATCA tax system, or FATOORA (e-invoicing).',
     mission: 'Fixes data and controls at the point of entry.',
     does: [
       'Loads new or changed data assets into the warehouse feeds',

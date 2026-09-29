@@ -9,7 +9,7 @@ export const SOURCES = [
     causes: ['Annual tariff update adds, splits and retires HS codes', 'VAT or excise rate change with an effective date', 'New excise goods category added in law', 'New e-invoicing wave brings new taxpayers and fields', 'New international reporting requirement'],
     example: {
       title: 'New tariff codes missing on 1 January',
-      story: 'The 2026 tariff schedule came into force on 1 January with 312 new 12-digit codes. The Customs Clearance System was updated, but the warehouse tariff reference table was not. For three weeks, 8,400 declaration lines could not be mapped to a tariff chapter and appeared as "Unknown" in the revenue and trade statistics dashboards.',
+      story: 'The 2026 tariff schedule came into force on 1 January with 312 new 12-digit codes. FASAH was updated, but the warehouse tariff reference table was not. For three weeks, 8,400 declaration lines could not be mapped to a tariff chapter and appeared as "Unknown" in the revenue and trade statistics dashboards.',
       impact: 'Duty by chapter misreported for January; trade statistics release delayed by a week.',
     },
     detect: 'Validity rule: HS code exists in the tariff in force on the declaration date; alert when "Unknown" chapter share exceeds 0.1%.',
@@ -24,7 +24,7 @@ export const SOURCES = [
     example: {
       title: 'Output VAT does not match e-invoices',
       story: 'In Q2, 1,870 taxpayers declared output VAT in their VAT return that was more than 2% different from the VAT on the e-invoices they issued in the same period. Most prepared the return from their general ledger, missing credit notes and invoices issued late in the month.',
-      impact: 'Estimated 96M of output VAT under-declared across the population, pending follow-up.',
+      impact: 'Estimated SAR 96M of output VAT under-declared across the population, pending follow-up.',
     },
     detect: 'Consistency rule between return and e-invoice totals; completeness rule for buyer VAT; accuracy rule for customs value.',
     prevent: 'Pre-filled VAT returns from e-invoice totals, calculated CIF in the declaration form, placeholder blocking at clearance, broker and taxpayer guidance.',
@@ -33,12 +33,12 @@ export const SOURCES = [
   },
   {
     id: 'integration', icon: Plug, name: 'Source systems & integrations', stage: 2, suggested: true,
-    what: 'Data moves between the Customs Clearance System, Tax Administration System, E-Invoicing Platform, treasury, other agencies and taxpayers’ own ERP systems. Interface mappings, missing validations, timeouts and different rounding logic corrupt or drop data in transit.',
+    what: 'Data moves between FASAH, the ZATCA tax system, FATOORA, SAMA, treasury, other agencies and taxpayers’ own ERP systems. Interface mappings, missing validations, timeouts and different rounding logic corrupt or drop data in transit.',
     causes: ['Interface rejects records silently on timeout', 'Taxpayer ERP (EGS) rounds VAT per line instead of per invoice', 'Courier manifest API does not map importer TIN', 'Different code lists in two systems', 'Batch timing: target read before source finished'],
     example: {
       title: 'Import VAT not posted to the tax ledger',
-      story: 'The nightly Customs → Tax interface transfers import VAT collected at the border to the tax ledger. After a network change, calls that took longer than 30 seconds timed out and the records were dropped without an error. 640 declarations with import VAT were never posted, so the taxpayers could not reclaim it as input VAT.',
-      impact: '11.2M of import VAT missing from the ledger; taxpayer refund claims rejected.',
+      story: 'The nightly FASAH → ZATCA tax ledger interface transfers import VAT collected at the border to the tax ledger. After a network change, calls that took longer than 30 seconds timed out and the records were dropped without an error. 640 declarations with import VAT were never posted, so the taxpayers could not reclaim it as input VAT.',
+      impact: 'SAR 11.2M of import VAT missing from the ledger; taxpayer refund claims rejected.',
     },
     detect: 'Record-count and amount reconciliation per interface run; accuracy rule: every import VAT has a ledger ID.',
     prevent: 'Data contracts with explicit types and rounding; quarantine instead of silent drops; interface regression tests; conformance testing for taxpayer EGS units.',
@@ -52,7 +52,7 @@ export const SOURCES = [
     example: {
       title: 'Amended VAT returns missed by the incremental load',
       story: 'The VAT return pipeline picked up changes by original submission date. When 2,310 taxpayers amended their Q1 returns in May, the amendments kept the original submission date and were never loaded. The gold layer still showed the original net VAT payable.',
-      impact: 'Net VAT payable for Q1 understated by 38M in the compliance and revenue forecasts.',
+      impact: 'Net VAT payable for Q1 understated by SAR 38M in the compliance and revenue forecasts.',
     },
     detect: 'Consistency rule between source and gold for latest amendment; row-count reconciliation per layer; freshness rule on load timestamp.',
     prevent: 'Load on amendment timestamp or change-data-capture; idempotent merges on business keys; DQ gates before gold promotion.',
@@ -79,8 +79,8 @@ export const SOURCES = [
     causes: ['Legacy migration created one registration per branch', 'Exchange rate feed gaps on holidays', 'Retired port or country codes still in use', 'Reference lists maintained in several places'],
     example: {
       title: 'Missing exchange rates on public holidays',
-      story: 'The central bank publishes no exchange rates on public holidays. 1,240 foreign-currency declarations lodged on those days found no rate, and the pipeline converted their value to 0. July customs duty on the revenue dashboard came out 4% below the treasury ledger.',
-      impact: 'July duty understated by 27M in reports until reprocessed.',
+      story: 'The SAMA (Saudi Central Bank) publishes no exchange rates on public holidays. 1,240 foreign-currency declarations lodged on those days found no rate, and the pipeline converted their value to 0. July customs duty on the revenue dashboard came out 4% below the treasury ledger.',
+      impact: 'July duty understated by SAR 27M in reports until reprocessed.',
     },
     detect: 'Completeness rule: a rate exists for every currency and calendar day; reconciliation of duty to the treasury ledger.',
     prevent: 'Govern exchange rates, tariff and port codes as CDEs with owners; fallback rules; one governed reference list per code set.',

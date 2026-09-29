@@ -62,6 +62,9 @@ export default function Framework() {
         tabs={[
           { id: 'framework', label: 'Framework' },
           { id: 'standards', label: 'Six standards' },
+          { id: 'method', label: 'Delivery methodology' },
+          { id: 'assess', label: 'Assessment approach' },
+          { id: 'request', label: 'DQ request lifecycle' },
           { id: 'lifecycle', label: 'BAU remediation lifecycle' },
           { id: 'e2e', label: 'End-to-end process' },
         ]}
@@ -70,6 +73,9 @@ export default function Framework() {
       />
       {tab === 'framework' && <FrameworkWheel />}
       {tab === 'standards' && <Standards />}
+      {tab === 'method' && <Methodology />}
+      {tab === 'assess' && <Assessment />}
+      {tab === 'request' && <RequestLifecycle />}
       {tab === 'lifecycle' && <Lifecycle />}
       {tab === 'e2e' && (
         <Section title="End-to-end: from rule creation to remediation" sub="Triggered when a new data asset is created in a Customs, Tax or E-Invoicing system (e.g., a new excise return, a new e-invoice field) or a new DQ rule is needed on an existing asset. Scroll sideways to follow the flow.">
@@ -208,6 +214,120 @@ function Lifecycle() {
           </button>
         ))}
       </div>
+    </Section>
+  )
+}
+
+const METHOD = [
+  { phase: 'Understand', color: 'var(--s3)', stages: [
+    ['Identify critical data', 'Identify the CDEs in scope, set target thresholds for each, and understand the business impact of poor data.', 'E.g., HS code, customs value and importer TIN for the import revenue use case.'],
+    ['Profile data sources', 'Profile each key source to get an unambiguous as-is picture and highlight hot spots.', 'Profile FASAH declaration lines and the tariff reference table.'],
+  ] },
+  { phase: 'Measure', color: 'var(--s1)', stages: [
+    ['Assess impact', 'Assess the business impact of issues found by profiling.', '5,900 lines on a generic HS code: duty at risk and trade statistics distorted.'],
+    ['Identify root causes', 'Map data flows for each CDE and find where in the lineage the data degrades.', 'Broker portal defaults to the generic code when the search returns nothing.'],
+  ] },
+  { phase: 'Implement', color: 'var(--s7)', stages: [
+    ['Implement remediation', 'Develop and apply a treatment for each issue.', 'Block the generic code for commercial shipments; broker guidance; re-classify open lines.'],
+    ['Monitoring & governance', 'Dashboards for continuous monitoring, plus the operating model and governance processes.', 'HS code validity on the DQ dashboard; reviewed monthly by the Customs Data Owner.'],
+  ] },
+]
+const DELIVERABLES = ['Data profiling & analytics', 'DQ rules assessment', 'Data cleansing & remediation', 'DQ process & controls', 'DQ policy & governance', 'DQ dashboards & visualization']
+
+function Methodology() {
+  let n = 0
+  return (
+    <Section title="Delivery methodology: understand, measure, implement" sub="A business-led, six-stage approach. Run it iteratively: each cycle refines rules and definitions and shows measurable improvement.">
+      <div className="grid g3">
+        {METHOD.map((p) => (
+          <div key={p.phase} className="card stack" style={{ gap: 12, borderTop: `4px solid ${p.color}` }}>
+            <div className="eyebrow" style={{ color: 'var(--ink-2)' }}>{p.phase}</div>
+            {p.stages.map(([t, d, e]) => {
+              n += 1
+              return (
+                <div key={t} className="stack" style={{ gap: 4 }}>
+                  <div className="row" style={{ gap: 8, flexWrap: 'nowrap' }}><span className="step-num">{n}</span><h4>{t}</h4></div>
+                  <p className="small" style={{ color: 'var(--ink-2)' }}>{d}</p>
+                  <p className="small"><b>ZATCA example:</b> {e}</p>
+                </div>
+              )
+            })}
+          </div>
+        ))}
+      </div>
+      <div className="card tint stack" style={{ gap: 10 }}>
+        <h4>Typical deliverables</h4>
+        <div className="row" style={{ gap: 8 }}>{DELIVERABLES.map((d) => <span key={d} className="pill navy" style={{ padding: '5px 12px' }}>{d}</span>)}</div>
+      </div>
+    </Section>
+  )
+}
+
+const ASSESS = [
+  { t: 'Obtain full scope of data attributes', d: 'Master list of attributes from prioritized use cases and stakeholder workshops.', e: '140 attributes behind the monthly import VAT & duty revenue report.' },
+  { t: 'Shortlist data attributes', d: 'Keep the attributes needed for the target report, using workshop output and past DQ reports.', e: 'Shortlist of 18: importer TIN, HS code, CIF, currency, exchange rate, duty, import VAT…' },
+  { t: 'Identify source & dataflow systems', d: 'Find the source system of each attribute and every system that holds a copy.', e: 'FASAH → warehouse landing → gold; SAMA rates; ZATCA tax ledger.' },
+  { t: 'Profile the data', d: 'Find anomalies and business-rule violations to judge whether existing data is usable.', e: '1,240 lines with no exchange rate; 5,900 on a generic HS code.' },
+  { t: 'Get Data Steward & owner input', d: 'Identify the owners of each source and dataflow system and collect their input.', e: 'Customs tariff steward, revenue accounting, SAMA feed owner.' },
+  { t: 'Define DQ rules', d: 'Write rules for each shortlisted attribute.', e: 'DQ00002 HS code valid, DQ00004 CIF accuracy, DQ00015 import VAT to ledger.' },
+  { t: 'Review interfaces', d: 'Review the ETL and any manual reconciliation between each pair of systems.', e: 'FASAH → ZATCA ledger interface: add count and amount reconciliation.' },
+  { t: 'Monitor & notify', d: 'Monitor quality over time and notify stewards of exceptions.', e: 'Daily scan; Steward notified when a rule drops to amber.' },
+  { t: 'Remediation actions', d: 'Compile remediation actions and present them to the business owners.', e: 'Action list presented to the Customs Operations Director.' },
+]
+
+function Assessment() {
+  return (
+    <Section title="Use-case-driven DQ assessment" sub="Nine steps to assess the data behind one report or use case. Worked example: the monthly import VAT & duty revenue report.">
+      <div className="stack" style={{ gap: 8 }}>
+        {ASSESS.map((a, i) => (
+          <div key={a.t} className="card flat" style={{ display: 'grid', gridTemplateColumns: '40px minmax(0, 1.1fr) minmax(0, 1fr)', gap: 14, alignItems: 'start', padding: 14 }}>
+            <span className="step-num" style={{ background: 'var(--accent)' }}>{i + 1}</span>
+            <div><h4>{a.t}</h4><p className="small" style={{ color: 'var(--ink-2)' }}>{a.d}</p></div>
+            <p className="small" style={{ background: 'var(--surface-2)', borderRadius: 6, padding: '8px 10px' }}><b>Example:</b> {a.e}</p>
+          </div>
+        ))}
+      </div>
+    </Section>
+  )
+}
+
+const REQ_STAGES = ['Intake & prioritization', 'Assessment & profiling', 'Root cause analysis', 'Remediation planning']
+const REQ_ROLES = [
+  { r: 'Head of DQ / DQ Manager', c: [['Prioritizes submitted requests', 'Decides and schedules the projects to execute'], ['Provides oversight'], ['Gives direction and context for the RCA'], ['Reviews the remediation plan and gives input']] },
+  { r: 'DQ Profiler', c: [['Confirms the scope of the request', 'Arranges access to the data'], ['Runs or coordinates profiling', 'Reviews and publishes results'], ['Works with stakeholders to find the root cause'], ['Helps write the remediation plan']] },
+  { r: 'Data Stewards', c: [['Provide business and DQ rules for the data elements'], ['Compare results with thresholds', 'Determine the impact'], ['Consulted on the root cause'], ['Help write the remediation plan']] },
+  { r: 'Requestor', c: [['Submits the request through the Intake Form'], ['Reviews results', 'Identifies anomalies with the DQ Profiler'], ['Works with the DQ Profiler on the root cause'], ['Submits the remediation plan and scope for funding approval', 'Starts the project']] },
+]
+const REQ_ART = [['Intake form', 'Request prioritization score'], ['Data profiling results', 'Listing of anomalies'], ['Documented root cause analysis', 'Impact assessment'], ['Remediation scope', 'Remediation plan', 'Effort estimate & approval']]
+
+function RequestLifecycle() {
+  return (
+    <Section title="DQ request lifecycle" sub="How a data quality request from a business team (e.g., Revenue Analytics asking why import VAT doesn't reconcile) moves from intake to a funded remediation plan.">
+      <div className="table-wrap">
+        <table className="t" style={{ minWidth: 900 }}>
+          <thead>
+            <tr>
+              <th style={{ width: 150 }}></th>
+              {REQ_STAGES.map((st, i) => (
+                <th key={st} style={{ background: 'var(--accent)', color: '#fff' }}><span className="row" style={{ gap: 8, flexWrap: 'nowrap' }}><span className="step-num" style={{ background: '#fff', color: 'var(--accent-ink)', width: 24, height: 24 }}>{i + 1}</span>{st}</span></th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {REQ_ROLES.map((row) => (
+              <tr key={row.r}>
+                <td style={{ fontWeight: 700, background: 'var(--surface-2)' }}>{row.r}</td>
+                {row.c.map((items, i) => <td key={i}><ul className="bullets small">{items.map((x) => <li key={x}>{x}</li>)}</ul></td>)}
+              </tr>
+            ))}
+            <tr>
+              <td style={{ fontWeight: 700, background: 'var(--navy)', color: '#fff' }}>Artifacts</td>
+              {REQ_ART.map((items, i) => <td key={i} style={{ background: 'var(--accent-soft)' }}><ul className="bullets small">{items.map((x) => <li key={x}>{x}</li>)}</ul></td>)}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <Callout title="Templates">The Intake Form, Request Prioritization Score and Listing of Anomalies templates are in the Templates tab.</Callout>
     </Section>
   )
 }

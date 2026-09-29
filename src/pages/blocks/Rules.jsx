@@ -72,6 +72,7 @@ export default function Rules({ go }) {
             </div>
           </Section>
           <ThresholdExplainer />
+          <ThresholdRoadmap />
           <Section title="Types of rules">
             <div className="table-wrap">
               <table className="t">
@@ -133,7 +134,7 @@ function RuleExamples() {
           </table>
         </div>
       </Section>
-      <Section title="Rule catalog" sub="Sixteen live-style rules across Customs, Tax and E-Invoicing and all six dimensions, with their latest scores." action={<Seg label="Filter by dimension" value={dim} onChange={setDim} options={['All', 'Completeness', 'Validity', 'Consistency', 'Uniqueness', 'Timeliness', 'Accuracy']} />}>
+      <Section title="Rule catalog" sub="Nineteen live-style rules across Customs, Tax and E-Invoicing (including FATOORA Phase 2 checks) and all six dimensions, with their latest scores." action={<Seg label="Filter by dimension" value={dim} onChange={setDim} options={['All', 'Completeness', 'Validity', 'Consistency', 'Uniqueness', 'Timeliness', 'Accuracy']} />}>
         <div className="table-wrap">
           <table className="t">
             <thead><tr><th>Rule ID</th><th>Domain</th><th>Business term</th><th>Rule</th><th>Dimension</th><th>Priority</th><th>Thresholds (G / A)</th><th>Technical rule</th><th className="num">Latest score</th></tr></thead>
@@ -150,5 +151,49 @@ function RuleExamples() {
         </div>
       </Section>
     </>
+  )
+}
+
+const ROADMAP = [
+  { d: 'Completeness', now: 96.6, target: 99, m: 'Q1 2027', cad: 'Quarterly' },
+  { d: 'Validity', now: 97.0, target: 99, m: 'Q2 2027', cad: 'Quarterly' },
+  { d: 'Accuracy', now: 96.6, target: 98.5, m: 'Q3 2027', cad: 'Half-yearly' },
+  { d: 'Consistency', now: 95.4, target: 98, m: 'Q4 2027', cad: 'Half-yearly' },
+  { d: 'Uniqueness', now: 99.6, target: 99.99, m: 'Q1 2027', cad: 'Quarterly' },
+  { d: 'Timeliness', now: 95.2, target: 98, m: 'Q2 2027', cad: 'Yearly' },
+]
+
+function Ring({ value, target }) {
+  const r = 30, c = 2 * Math.PI * r
+  return (
+    <svg width="78" height="78" viewBox="0 0 78 78" role="img" aria-label={`${value}% of ${target}% target`}>
+      <circle cx="39" cy="39" r={r} fill="none" stroke="var(--surface-3)" strokeWidth="8" />
+      <circle cx="39" cy="39" r={r} fill="none" stroke="var(--s1)" strokeWidth="8" strokeLinecap="round" strokeDasharray={`${(value / 100) * c} ${c}`} transform="rotate(-90 39 39)" />
+      <line x1="39" y1="4" x2="39" y2="14" stroke="var(--ink)" strokeWidth="2" transform={`rotate(${(target / 100) * 360} 39 39)`} />
+      <text x="39" y="43" textAnchor="middle" fontSize="12" fontWeight="700" fill="var(--ink)">{value}%</text>
+    </svg>
+  )
+}
+
+function ThresholdRoadmap() {
+  return (
+    <Section title="Threshold roadmap" sub="Explore the current quality of each dimension, then set targets and milestones from business requirements. Review them quarterly, half-yearly or yearly, and translate each target into DQ rules.">
+      <div className="grid g3">
+        {ROADMAP.map((x) => (
+          <div key={x.d} className="card flat row" style={{ gap: 14, flexWrap: 'nowrap', alignItems: 'center' }}>
+            <Ring value={x.now} target={x.target} />
+            <div className="stack" style={{ gap: 3, minWidth: 0 }}>
+              <h4>{x.d}</h4>
+              <span className="small">Target <b>{x.target}%</b> by <b>{x.m}</b></span>
+              <span className="xs muted">Review: {x.cad}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="legend"><span><i style={{ background: 'var(--s1)' }} />Current score (all domains)</span><span><i style={{ background: 'var(--ink)', width: 3 }} />Target</span></div>
+      <Callout title="Set targets from the business need, not at 100%">
+        A 100% target sounds right but is rarely worth the effort for every element. Uniqueness of invoice UUIDs should be close to 100%; a descriptive field like trader trading name can sit much lower. Stage the targets over milestones and raise them as controls improve.
+      </Callout>
+    </Section>
   )
 }

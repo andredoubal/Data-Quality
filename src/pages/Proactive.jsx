@@ -22,9 +22,9 @@ const STAGES = [
       'Declaration form validates HS code against the tariff in force and country of origin against ISO 3166',
       'Customs value (CIF) calculated automatically from FOB, freight and insurance',
       'E-invoicing platform rejects invoices that fail the XML schema or business rules at clearance',
-      'VAT number check-digit validation and placeholder blocking (e.g., 000000000000000)',
+      'VAT number format validation (15 digits, starts and ends with 3) and placeholder blocking (e.g., 000000000000000)',
     ],
-    example: 'At clearance, the E-Invoicing Platform rejects a standard B2B invoice whose buyer VAT number is missing or fails the check digit, and returns a clear error code to the taxpayer’s system in real time.',
+    example: 'At clearance, FATOORA rejects a standard B2B invoice whose buyer VAT number is missing or not in the Saudi 15-digit format (starting and ending with 3), and returns a clear error code to the taxpayer’s system in real time.',
   },
   {
     id: 'integration', label: 'Integration', icon: Plug,
@@ -35,7 +35,7 @@ const STAGES = [
       'Reject-and-quarantine of records failing mandatory checks, never silent drops',
       'Interface monitoring with SLAs and a named owner on call',
     ],
-    example: 'Every night, the Customs → Tax interface compares 18,402 declarations and 41.7M in import VAT sent against what the tax ledger received, and blocks the posting run if either total differs.',
+    example: 'Every night, the FASAH → ZATCA tax ledger interface compares 18,402 declarations and SAR 41.7M in import VAT sent against what the tax ledger received, and blocks the posting run if either total differs.',
   },
   {
     id: 'pipeline', label: 'Warehouse & pipelines', icon: Database,
@@ -128,7 +128,7 @@ export default function Proactive() {
         <div className="grid g4">
           {[
             ['Data standards', 'Formats and code lists (HS, ISO country, UN/LOCODE, currency) agreed and published in the catalog.'],
-            ['Validation at submission', 'Mandatory fields, tariff look-ups, check digits and calculated fields in forms and APIs.'],
+            ['Validation at submission', 'Mandatory fields, tariff look-ups, VAT number format checks and calculated fields in forms and APIs.'],
             ['E-invoice clearance rules', 'Schema and business-rule checks that reject a bad invoice before it is issued.'],
             ['DQ gates', 'Rules executed inside pipelines that stop or quarantine bad loads.'],
             ['Data contracts', 'Agreed schema, meaning and timing between Customs, Tax and E-Invoicing systems.'],
